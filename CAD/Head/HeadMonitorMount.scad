@@ -44,7 +44,12 @@ resolutionLow   = debug ? 10 : 20;
 
 InnerFaceWidth=180;
 InnerFaceHeight=150;
-InnerFaceDepth=22;
+InnerFaceDepth=20;
+InnerFaceDemoRotation=0;
+
+motorDistance = InnerFaceWidth+17;
+
+motorHolderAngle = 30;
 
 MonitorLCDDepth=7;
 
@@ -98,20 +103,20 @@ module MonitorScrewHoles()
 
 module HDMIPort() {
     width=30;
-    height=17;
-    depth=8;
+    height=23;
+    depth=14;
     margin=3;
-    posY = 115/2-30;
-    translate([InnerFaceWidth/2-width/2,MonitorLCDDepth-margin,posY]) rotate([0,0,0]) cube([width,depth*2,height],center=false);
+    posY = 115/2-33;
+    translate([InnerFaceWidth/2-width/2,MonitorLCDDepth-margin,posY]) rotate([0,0,0]) cube([width,depth,height],center=false);
 }
 
 module USBPort() {
     width=30;
     height=12;
-    depth=8;
+    depth=11;
     margin=3;
     posY = 115/2-46;
-    translate([InnerFaceWidth/2-width/2,MonitorLCDDepth-margin,posY]) rotate([0,0,0]) cube([width,depth*2,height],center=false);
+    translate([InnerFaceWidth/2-width/2,MonitorLCDDepth-margin,posY]) rotate([0,0,0]) cube([width,depth,height],center=false);
 }
 
 module InnerFace() {
@@ -157,22 +162,93 @@ module InnerHead() {
     }
 }
 
-
-difference() 
-{
-    InnerHead();
-    union() {
-        motorDistance = InnerFaceWidth+7;
-        motorAngle = 45;
-        translate([0,17,-10]) {
-            translate([-motorDistance/2,0,0]) rotate ([90-motorAngle,0,0]) rotate ([0,90,0]) Stepper5VGear(10);
-            translate([motorDistance/2,0,0]) rotate ([-90-motorAngle,0,0]) rotate ([0,-90,0]) Stepper5VGear(10);
+module OneMotor(left, axisAngle) {
+    rotate([0, 90,0]) {
+        if (left) {
+             Stepper5VGear(10,axisAngle);
+        } else {
+            mirror([0,0,1])Stepper5VGear(10,axisAngle);
         }
     }
 }
 
+module MotorHolder(left, drawMotor) 
+{
+    //rotate ([0,90,0]) cylinder(1000,r=1,$fn=resolution,center=true);
+    
+    x = left ? -motorDistance/2 : motorDistance/2;
+    
+    MotorHolderWidth = 8;
+    MotorHolderHeight = 200;
+    MotorHolderDepth = 42;
+    
+    translate([x,0,-7.7]) 
+    {
+        difference() 
+        {
+            union() 
+            {
+                translate([0,0,-MotorHolderHeight/2]) cube([MotorHolderWidth,MotorHolderDepth,MotorHolderHeight],center=true); 
+                rotate([0,90,0]) cylinder(MotorHolderWidth,r=MotorHolderDepth/2,$fn=resolution,center=true);
+            }
+            translate([left ? 4.5 : -4.5,0,0]) 
+            {    
+                OneMotor(left, 90-motorHolderAngle);
+            }
+        }
+        if (drawMotor) {
+            translate([left ? 4.5 : -4.5,0,0]) 
+            {    
+                OneMotor(left, 90-motorHolderAngle);
+            }
+        }
+    }
+}
 
+motorHolderTranslation = [0,10,-5];
+motorHolderRotation = [motorHolderAngle-InnerFaceDemoRotation,0,0];
 
+module DrawInnerHead() {
+    rotate([InnerFaceDemoRotation,0,0]) 
+    {
+        difference() 
+        {
+            InnerHead();
+            translate(motorHolderTranslation) 
+            {
+                rotate (motorHolderRotation) 
+                {
+                    MotorHolder(false, true);
+                    MotorHolder(true, true);  
+                }
+            }
+        }
+    }
+}
+    
+bottomYPos = -100;
 
+module DrawMotorHolders() {
+    difference() {
+        rotate([InnerFaceDemoRotation,0,0]) 
+        {
+            // motor holder and outer head 
+            translate(motorHolderTranslation) 
+            {
+                rotate (motorHolderRotation) 
+                {
+                    MotorHolder(false, false);
+                    MotorHolder(true, false);  
+                }
+            }
+        }
+        dummySize = 400;
+        translate([-dummySize/2,-dummySize/2,bottomYPos-dummySize]) cube([dummySize,dummySize,dummySize],center=false); 
+    }
+    translate([-(motorDistance+8)/2,40.6,bottomYPos]) cube([motorDistance+8,50,10],center=false); 
+}
+
+DrawInnerHead();
+DrawMotorHolders();
 
 
