@@ -44,17 +44,22 @@ resolutionLow   = debug ? 10 : 20;
 
 InnerFaceWidth=180;
 InnerFaceHeight=150;
+InnerFaceDepth=22;
+
 MonitorLCDDepth=7;
 
 cameraPos = [0,12,67];
+
+use <..\Includes\Stepper5VGear.scad>
 
 module Camera() 
 {
     depth = 30;
     depthPCB=10;
-    translate([0,-2,0]) cube([26,depthPCB,25],center=true); // pcb
+    depthPCB2=20;
+    translate([0,-2-(depthPCB2/2-5),0]) cube([26,depthPCB2,25],center=true); // pcb
     translate([0,0,-2.5]) cube([9.2,depth,9.2],center=true); // camera
-    translate([-7.5,0,7]) rotate([90,0,0]) cylinder(depth,r=1,$fn=resolutionLow,center=true); // Led
+    translate([-7.5,depth/2,7]) rotate([90,0,0]) cylinder(depth,r=1,$fn=resolutionLow,center=true); // Led
     translate([-7.5,depthPCB-7,7]) rotate([90,0,0]) cylinder(6,r=3,$fn=resolutionLow,center=true); // Led hole
     translate([0,0,7]) cube([8,4 +(depthPCB-5),11],center=true); // clip hole
 }
@@ -65,7 +70,6 @@ module CameraBox()
     translate([0,depth,0]) color([0,0,1]) cube([29,depth,29],center=true); // camera box   
 }
 
-    
 module MonitorLCD() {
     width=166;
     height=105;
@@ -117,8 +121,8 @@ module InnerFace() {
     margin= 14;
     difference() 
     {
-        translate([-width/2,0,-height/2+additionalTopHeight/2]) cube([width,15,height],center=false);
-        translate([0,15,height/2-margin]) cube([width-margin*3,15,20],center=true);
+        translate([-width/2,0,-height/2+additionalTopHeight/2]) cube([width,InnerFaceDepth,height],center=false);
+        translate([0,15,height/2-margin]) cube([width-margin*3,InnerFaceDepth,20],center=true);
     }
 }
 
@@ -131,28 +135,41 @@ module HeadSphere(radius)
     }
 }
 
-intersection() {
-    difference() {
-        union() {
-            difference() {
-                InnerFace();
+module InnerHead() {
+    intersection() {
+        difference() {
             union() {
-                MonitorLCD();
-                MonitorPCB();
-                MonitorScrewHoles();
-                HDMIPort();
-                USBPort();
+                difference() {
+                    InnerFace();
+                union() {
+                    MonitorLCD();
+                    MonitorPCB();
+                    MonitorScrewHoles();
+                    HDMIPort();
+                    USBPort();
+                }
             }
+            translate(cameraPos) rotate([0,0,180]) CameraBox();
+            }
+            translate(cameraPos) rotate([0,0,180]) Camera();
         }
-        translate(cameraPos) rotate([0,0,180]) CameraBox();
-        }
-        translate(cameraPos) rotate([0,0,180]) Camera();
+        HeadSphere(131);
     }
-    HeadSphere(130);
 }
 
 
-
+difference() 
+{
+    InnerHead();
+    union() {
+        motorDistance = InnerFaceWidth+7;
+        motorAngle = 45;
+        translate([0,17,-10]) {
+            translate([-motorDistance/2,0,0]) rotate ([90-motorAngle,0,0]) rotate ([0,90,0]) Stepper5VGear(10);
+            translate([motorDistance/2,0,0]) rotate ([-90-motorAngle,0,0]) rotate ([0,-90,0]) Stepper5VGear(10);
+        }
+    }
+}
 
 
 
