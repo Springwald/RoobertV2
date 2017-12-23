@@ -8,9 +8,9 @@
 
  Project website: http://roobert.springwald.de
 
- ######################
- # head monitor mount #
- ######################
+ ##############
+ # neck parts #
+ ##############
 
  Licensed under MIT License (MIT)
 
@@ -291,37 +291,36 @@ module DrawInnerHead() {
     
 module MotorHolderSkrewHoles(leftHolder) {
     move = leftHolder==false ? (motorDistance-25)/2 : -(motorDistance-25)/2 ;
+    
     translate([move, 50,bottomYPos])cylinder(30,r=3.2/2,$fn=resolutionLow(),center=true);
-    translate([move, 80,bottomYPos])cylinder(30,r=3.2/2,$fn=resolutionLow(),center=true);   
+    translate([move, 80,bottomYPos])cylinder(30,r=3.2/2,$fn=resolutionLow(),center=true);
+    
 }
 
 bottomYPos = -100;
 
 module DrawMotorHolder(leftHolder, drawMotor) {
     difference() {
-        union() {
-            difference() {
-                rotate([InnerFaceDemoRotation,0,0]) 
+        rotate([InnerFaceDemoRotation,0,0]) 
+        {
+            // motor holder and outer head 
+            translate(motorHolderTranslation) 
+            {
+                rotate (motorHolderRotation) 
                 {
-                    // motor holder and outer head 
-                    translate(motorHolderTranslation) 
-                    {
-                        rotate (motorHolderRotation) 
-                        {
-                            MotorHolder(leftHolder, drawMotor);
-                        }
-                    }
+                    MotorHolder(leftHolder, drawMotor);
                 }
-                dummySize = 400;
-                translate([-dummySize/2,-dummySize/2,bottomYPos-dummySize]) cube([dummySize,dummySize,dummySize],center=false); // Height cut
             }
-            bottomWidth=25;
-            bottomHeight=5;
-            move = leftHolder==false ? (motorDistance+MotorHolderWidth)/2 - bottomWidth: -(motorDistance+MotorHolderWidth)/2 ;
-            translate([move, 40.6,bottomYPos]) cube([bottomWidth,50,bottomHeight],center=false);  // bottom
         }
-        MotorHolderSkrewHoles(leftHolder);
+        dummySize = 400;
+        translate([-dummySize/2,-dummySize/2,bottomYPos-dummySize]) cube([dummySize,dummySize,dummySize],center=false); // Height cut
     }
+    bottomWidth=25;
+    bottomHeight=5;
+    move = leftHolder==false ? (motorDistance+MotorHolderWidth)/2 - bottomWidth: -(motorDistance+MotorHolderWidth)/2 ;
+    translate([move, 40.6,bottomYPos]) cube([bottomWidth,50,bottomHeight],center=false);  // bottom
+    
+    MotorHolderSkrewHoles(leftHolder);
 }
 
 
@@ -329,6 +328,7 @@ module DrawMotorHolder(leftHolder, drawMotor) {
 DrawInnerHead();
 
 DrawMotorHolder(leftHolder=true, drawMotor=true);
+
 DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
