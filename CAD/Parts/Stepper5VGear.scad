@@ -32,7 +32,7 @@ module Stepper5VGear (margin, axisrotation)
     translate([0,-35/2,-bodyHeight-2]) cylinder(h=22* faktor, r=2.05* faktor,  $fn=50, center=false);   
     
     // cable holder
-    translate([bodyRadius,0,-bodyHeight/2]) cube([6.24* faktor,17.5* faktor,bodyHeight],center=true);
+    translate([bodyRadius,0,-bodyHeight/2]) cube([8* faktor,17.5* faktor,bodyHeight],center=true);
     
     // Print-Dummy-Base
     //baseHeight = 3;

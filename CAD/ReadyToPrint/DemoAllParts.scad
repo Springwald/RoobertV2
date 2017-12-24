@@ -40,10 +40,13 @@
 $exportQuality = false;
 
 use <..\Parts\HeadParts.scad>
+use <..\Parts\NeckParts.scad>
 
 DrawInnerHead();
 DrawMotorHolder(leftHolder=true, drawMotor=true);
 DrawMotorHolder(leftHolder=false, drawMotor=true);
+NeckPipe();
+NeckTop();
 
 
 

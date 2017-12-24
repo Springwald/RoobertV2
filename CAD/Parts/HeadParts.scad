@@ -233,17 +233,29 @@ module OneMotor(left, axisAngle) {
     }
 }
 
+module InnerHeadEndStopSwitch() {
+    holeRadius = 2.6/2;
+    translate([0,6,-9.5 / 2])rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
+    translate([0,6,9.5 / 2]) rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
+    cube([6.1,19,21],center=true); 
+}
+
+module MotorHolderCableHolder() {
+    holeRadius = 2.6/2;
+    translate([0,5,0]) rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
+    translate([0,-5,0]) rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
+}
+
+
 MotorHolderWidth = 7;
 
 module MotorHolder(left, drawMotor) 
 {
-    //rotate ([0,90,0]) cylinder(1000,r=1,$fn=resolution,center=true);
-    
     x = left ? -motorDistance/2 : motorDistance/2 ;
     
     MotorHolderHeight = 200;
     MotorHolderDepth = 42;
-    
+
     translate([x,0,-7.7]) 
     {
         difference() 
@@ -253,17 +265,32 @@ module MotorHolder(left, drawMotor)
             {
                 translate([0,0,-MotorHolderHeight/2]) cube([MotorHolderWidth,MotorHolderDepth,MotorHolderHeight],center=true); 
                 rotate([0,90,0]) cylinder(MotorHolderWidth,r=MotorHolderDepth/2,$fn=resolutionHi(),center=true);
+                
             }
-            translate([left ? 4.5 : -4.5,0,0]) 
-            {    
-                OneMotor(left, 90-motorHolderAngle);
+            union() {
+                translate([left ? 4.5 : -4.5,0,0]) 
+                {    
+                    OneMotor(left, 90-motorHolderAngle);
+                }
+                // endstop microswitch
+                if (!left) {
+                    translate([-7,10,-47])  InnerHeadEndStopSwitch();
+                }
+                // motor cable holder
+                for (i=[0:2]){
+                    
+                    translate([0,i*i*3,-30-i*30]) rotate([i==2?90: 0,0,0]) MotorHolderCableHolder();
+                }
             }
         }
-        if (drawMotor) {
-            translate([left ? 4.5 : -4.5,0,0]) 
-            {    
-                OneMotor(left, 90-motorHolderAngle);
+        union() {
+            if (drawMotor) {
+                translate([left ? 4.5 : -4.5,0,0]) 
+                {    
+                    OneMotor(left, 90-motorHolderAngle);
+                }
             }
+            
         }
     }
 }
