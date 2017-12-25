@@ -51,7 +51,7 @@ motorHolderAngle = 30;
 
 MonitorLCDDepth=7;
 
-cameraPos = [0,12,67];
+cameraPos = [6,10,70.5];
 
 use <Stepper5VGear.scad>
 
@@ -76,14 +76,14 @@ module CameraBox()
 
 module MonitorLCD() {
     width=166;
-    height=105;
+    height=109;
     depth= MonitorLCDDepth;
     translate([-width/2,-depth,-height/2]) cube([width,depth*20,height],center=false);
 }
 
 module MonitorPCB() {
     width=167;
-    height=125;
+    height=127;
     depth= 50;
     sticks = 12;
     difference() {
@@ -115,16 +115,16 @@ module HDMIPort() {
 
 module USBPort() {
     width=30;
-    height=12;
+    height=13;
     depth=11;
     margin=3;
-    posY = 115/2-46;
+    posY = 115/2-47;
     translate([InnerFaceWidth/2-width/2,MonitorLCDDepth-margin,posY]) rotate([0,0,0]) cube([width,depth,height],center=false);
 }
 
 module GroveUltraSonicSensor() {
 
-    sensorDiameter = 16;
+    sensorDiameter = 17;
     sensorHeight= 30;
     sensorDistance=22;
     
@@ -133,10 +133,10 @@ module GroveUltraSonicSensor() {
     translate ([-sensorDistance/2,-sensorHeight/2,0]) rotate([90,0,0])  cylinder(sensorHeight, r=sensorDiameter/2, $fn=resolutionHi(), center=true);
     
     //PCB
-    cube([50,20,25],center=true);
+    cube([54,20,28],center=true);
     
     // Cable adapter
-    translate ([0,-11,-10]) cube([12,8,20],center=true);
+    translate ([0,5,-10]) cube([12,40,20],center=true);
 }
 
 module GrovePIRMotionSensor() {
@@ -144,14 +144,14 @@ module GrovePIRMotionSensor() {
     sensorDiameter = 16;
     sensorHeight= 30;
 
-    // Sensors    
-    translate ([-16,-9.5,0]) rotate([90,0,0])  cylinder(sensorHeight, r=sensorDiameter/2, $fn=resolutionHi(), center=true);
+    // Sensor
+    translate ([-12.,-9.5,0]) rotate([90,0,0])  cylinder(sensorHeight, r=sensorDiameter/2, $fn=resolutionHi(), center=true);
     
     //PCB
     cube([47,20,24],center=true);
     
     // Cable adapter
-    translate ([18,19.5-11,-2]) cube([11,60,17],center=true);
+    translate ([15.5,19.5-11,-2]) cube([16,60,17],center=true);
 }
 
 module GLVL53L0XV2_TimeOfLightSensor() {
@@ -174,7 +174,7 @@ module GLVL53L0XV2_TimeOfLightSensor() {
 
 
 module InnerFace() {
-    additionalTopHeight = 7;
+    additionalTopHeight = 11;
     width=180;
     height=150 + additionalTopHeight;
     margin= 14;
@@ -185,12 +185,22 @@ module InnerFace() {
     }
 }
 
+module HeadSphereOld(radius) 
+{
+    intersection() 
+    {
+        rotate([10,0,0]) scale ([0.9,1.1,0.72]) sphere(radius*1.1, $fn=resolutionHi(), center=true);
+        translate ([0,0,190]) rotate([10,0,0]) scale([3,2.5,2])  sphere(radius, $fn=resolutionHi(), center=true);
+    }
+}
+
 module HeadSphere(radius) 
 {
     intersection() 
     {
-        rotate([10,0,0]) scale ([0.9,1.1,0.72]) sphere(radius, $fn=resolutionHi(), center=true);
-        translate ([0,0,190]) rotate([10,0,0]) scale([3,2.5,2])  sphere(radius, $fn=resolutionHi(), center=true);
+        rotate([10,0,0]) scale ([1,1.1,0.75]) sphere(radius, $fn=resolutionHi(), center=true);
+        translate ([0,0,190]) rotate([10,0,0]) scale([3,3.5,2])  sphere(radius, $fn=resolutionHi(), center=true);
+        translate ([0,0,5]) rotate([10,0,0])   sphere(radius*0.86, $fn=resolutionHi(), center=true);
     }
 }
 
@@ -206,20 +216,19 @@ module InnerHead() {
                     MonitorScrewHoles();
                     HDMIPort();
                     USBPort();
-                    translate([-40,22,67]) GroveUltraSonicSensor();
-                    translate([40,24,67]) rotate([0,0,0]) GrovePIRMotionSensor();
-                    translate([0,15,-60]) GLVL53L0XV2_TimeOfLightSensor();
+                    translate([-37,22,70.5]) GroveUltraSonicSensor();
+                    translate([45,24,70]) rotate([0,0,0]) GrovePIRMotionSensor();
+                    translate([0,15,-62]) GLVL53L0XV2_TimeOfLightSensor();
                 }
             }
             translate(cameraPos) rotate([0,0,180]) CameraBox();
             }
             translate(cameraPos) rotate([0,0,180]) Camera();
+            translate ([0,26,50]) cube([160,20,50],center=true);// Head material saver top
+            translate ([0,17,-50]) cube([150,20,30],center=true);// Head material saver bottom
         }
         HeadSphere(131);
-    }
-    
-   
-    
+    }  
     
 }
 
@@ -355,8 +364,8 @@ module DrawMotorHolder(leftHolder, drawMotor) {
 
 DrawInnerHead();
 
-DrawMotorHolder(leftHolder=true, drawMotor=true);
-DrawMotorHolder(leftHolder=false, drawMotor=true);
+//DrawMotorHolder(leftHolder=true, drawMotor=true);
+//DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
 

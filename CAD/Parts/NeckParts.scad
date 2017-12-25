@@ -37,37 +37,81 @@
 
 */
 
-function resolutionLow() = ($exportQuality==true) ? 30 : 10;
+function resolutionLow() = ($exportQuality==true) ? 20 : 10;
 function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 use <..\Parts\HeadParts.scad>
+use <..\Parts\Stepper5VGear.scad>
 
-motorDistance = InnerFaceWidth+17;
 bottomYPos = -100;
+neckPipeXPos = 100;
+
+innerNeckPipeDiameter = 33.8;
+innerNeckPipeHeight=30;
+
+
+module PCF8574() {
+    radius = 2.7 /2;
+    depth = 10;
+    distanceX= 27;
+    distanceZ=29.5;
+    width=32;
+    height=35;
+    
+    translate([distanceX / 2,  distanceZ / 2,-depth]) cylinder(h=depth * 2, r=radius, $fn=resolutionLow(), center=true); 
+    translate([-distanceX / 2, distanceZ / 2,-depth]) cylinder(h=depth * 2, r=radius, $fn=resolutionLow(), center=true); 
+    translate([-distanceX / 2,-distanceZ / 2,-depth]) cylinder(h=depth * 2, r=radius, $fn=resolutionLow(), center=true); 
+    translate([distanceX / 2, -distanceZ / 2,-depth]) cylinder(h=depth * 2, r=radius, $fn=resolutionLow(), center=true); 
+    
+    cube([width,height,3],center=true);
+}
+
+module NeckPipeHole() {
+    margin=2;
+    translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) {
+        cylinder(innerNeckPipeHeight+50,r=innerNeckPipeDiameter/2-margin,$fn=resolutionHi(),center=true); 
+    }
+}
 
 module NeckPipe() {
-    innerPipeDiameter = 33.8;
-    innerPipeHight=30;
-    margin=2;
-    difference() {
-        cylinder(innerPipeHight,r=innerPipeDiameter/2,$fn=resolutionHi(),center=true); 
-        cylinder(innerPipeHight+10,r=innerPipeDiameter/2-margin,$fn=resolutionHi(),center=true); 
+    translate([0,0,bottomYPos]) {
+        difference() {
+                translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) cylinder(innerNeckPipeHeight,r=innerNeckPipeDiameter/2,$fn=resolutionHi(),center=true); 
+                NeckPipeHole();
+        }
     }
 }
 
 module NeckTop() {
     
-    bottomWidth=204;
-    bottomHeight=5;
-    difference() {
-        union() {
-            translate([0, 65.5,bottomYPos-bottomHeight/2]) cube([bottomWidth,50,bottomHeight],center=true);  // bottom
+    translate([0,0,bottomYPos]) {
+        bottomWidth=204;
+        bottomDepth=30;
+        bottomHeight=5;
+        difference() {
+            union() {
+                translate([0, 65.5+bottomDepth/2,-bottomHeight/2]) cube([bottomWidth,50+bottomDepth,bottomHeight],center=true);  // bottom
+            }
+            union() {
+                MotorHolderSkrewHoles(true);
+                MotorHolderSkrewHoles(false);
+                NeckPipeHole();
+            }
         }
-        MotorHolderSkrewHoles(true);
-        MotorHolderSkrewHoles(false);
+        
+        motorPcbX = 60;
+        translate([motorPcbX, 75, 5]) Stepper5VGearPCB();
+        translate([-motorPcbX, 75, 5]) Stepper5VGearPCB();
+        PCF8574();
     }
 }
 
+
+
+
+
+
+DrawInnerHead();
 
 
 
