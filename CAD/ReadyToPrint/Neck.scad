@@ -8,10 +8,6 @@
 
  Project website: http://roobert.springwald.de
 
- #######################################################
- # all head and neck parts assembled for demonstration #
- #######################################################
-
  Licensed under MIT License (MIT)
 
  Copyright (c) 2018 Daniel Springwald | daniel@springwald.de
@@ -37,15 +33,10 @@
 
 */
 
-$exportQuality = false;
+$exportQuality = true;
 
-use <..\Parts\HeadParts.scad>
 use <..\Parts\NeckParts.scad>
 
-FacePlate();
-DrawInnerHead();
-DrawMotorHolder(leftHolder=true, drawMotor=false);
-DrawMotorHolder(leftHolder=false, drawMotor=false);
 NeckPipe();
 NeckTop(drawPcbs=false);
 

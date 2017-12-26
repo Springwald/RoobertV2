@@ -232,12 +232,45 @@ module InnerHead() {
     
 }
 
+module FacePlate() {
+    depth=1.5;
+    radius=4;
+    distX = 165;
+    distY = 115;
+    holeWidth = 158;
+    holeHeight = 90;
+    holeMoveY = 5;
+    
+    color([0,0,1]) {    
+        difference() {
+            translate([0,-depth/2,0]) {
+                translate([-distX/2,0,distY/2]) rotate([90,0,0]) cylinder(depth,r=radius,$fn=resolutionHi(),center=true); // 1
+                translate([distX/2,0,distY/2]) rotate([90,0,0]) cylinder(depth,r=radius,$fn=resolutionHi(),center=true); // 2
+                translate([-distX/2,0,-distY/2]) rotate([90,0,0]) cylinder(depth,r=radius,$fn=resolutionHi(),center=true); // 3
+                translate([distX/2,0,-distY/2]) rotate([90,0,0]) cylinder(depth,r=radius,$fn=resolutionHi(),center=true); // 4
+                
+                translate([0,0,0]) cube([distX+radius*2, depth,distY], center=true); 
+                translate([0,0,0]) cube([distX, depth,distY+radius*2], center=true); 
+            }
+            union() {
+                MonitorScrewHoles();
+                r1 = 500;
+                r2 = 800;
+                translate([0,0,holeMoveY]) cube([holeWidth, 20,holeHeight], center=true); 
+                translate([0,0,-57-r1]) rotate([90,0,0]) cylinder(50,r=r1,$fn=resolutionHi(),center=true);  
+                translate([0,0,57+r2]) rotate([90,0,0]) cylinder(50,r=r2,$fn=resolutionHi(),center=true); 
+
+            }
+        }
+    }
+}
+
 module OneMotor(left, axisAngle) {
     rotate([0, 90,0]) {
         if (left) {
-             Stepper5VGear(10,axisAngle);
+             Stepper5VGear(true,axisAngle);
         } else {
-            mirror([0,0,1])Stepper5VGear(10,axisAngle);
+            mirror([0,0,1])Stepper5VGear(true,axisAngle);
         }
     }
 }
@@ -362,10 +395,11 @@ module DrawMotorHolder(leftHolder, drawMotor) {
 
 
 
+FacePlate();
 DrawInnerHead();
 
-//DrawMotorHolder(leftHolder=true, drawMotor=true);
-//DrawMotorHolder(leftHolder=false, drawMotor=true);
+DrawMotorHolder(leftHolder=true, drawMotor=true);
+DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
 
