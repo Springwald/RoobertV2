@@ -90,12 +90,12 @@ module NeckPipeHole() {
     }
 }
 
-module NeckGearAdapter() {
+module NeckGearAdapter(margin) {
     height= 6;
     radius=20;
     color([0,1,1]) {
         translate([0,neckPipeXPos,-10-height/2]) {
-            cylinder(height,r=radius,$fn=6,center=true); 
+            cylinder(height,r=radius+margin,$fn=6,center=true); 
         }   
     }
 }
@@ -108,7 +108,7 @@ module NeckPipe() {
             union() {
                 translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) cylinder(innerNeckPipeHeight,r=innerNeckPipeDiameter/2,$fn=resolutionHi(),center=true); 
                 color([1,0,1]) translate([0,neckPipeXPos,-distancerHeight*1.5]) cylinder(distancerHeight,r=distancerDiameter/2,$fn=resolutionHi(),center=true); 
-                NeckGearAdapter();
+                NeckGearAdapter(0);
             }
             NeckPipeHole();
         }
@@ -155,15 +155,40 @@ module NeckTop(drawPcbs) {
 }
 
 
+module NeckGear() {
+    top = -113;
+    
+    //translate([0,neckPipeXPos,top]) {
+    //    cylinder(4,r=115/2,$fn=resolutionHi(),center=true); 
+    //}
+    
+    scaler = 1.3;
+    difference() 
+    {
+        translate([-0.6,-0.6+neckPipeXPos,top]) {
+            color([0,1,0]) {
+                scale([scaler,scaler,1]) {
+                linear_extrude(height = 6, center = true, convexity = 100)
+                    import("NeckGear.dxf");
+                }
+            }
+        }
+        translate([0,0,top+130]) {
+            scale([1,1,10]){
+                NeckGearAdapter(0.5);
+            }
+        }
+    }
+}
 
-DrawInnerHead();
+//DrawInnerHead();
 
-
+NeckGear();
 
 NeckPipe();
-NeckTop(drawPcbs=true);
-DrawMotorHolder(leftHolder=true, drawMotor=true);
-DrawMotorHolder(leftHolder=false, drawMotor=true);
+NeckTop(drawPcbs=false);
+//DrawMotorHolder(leftHolder=true, drawMotor=true);
+//DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
 
