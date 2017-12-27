@@ -41,6 +41,7 @@ $exportQuality = false;
 
 use <..\Parts\HeadParts.scad>
 use <..\Parts\NeckParts.scad>
+use <..\Parts\NeckBottomParts.scad>
 
 FacePlate();
 DrawInnerHead();
@@ -49,6 +50,7 @@ DrawMotorHolder(leftHolder=false, drawMotor=false);
 NeckPipe();
 NeckTop(drawPcbs=false);
 NeckGear(0);
+NeckMotor();
 
 
 
