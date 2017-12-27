@@ -167,6 +167,7 @@ module NeckGear() {
     {
         translate([-0.6,-0.6+neckPipeXPos,top]) {
             color([0,1,0]) {
+                rotate([0,0,4.5])
                 scale([scaler,scaler,1]) {
                 linear_extrude(height = 6, center = true, convexity = 100)
                     import("NeckGear.dxf");

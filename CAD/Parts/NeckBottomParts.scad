@@ -8,9 +8,9 @@
 
  Project website: http://roobert.springwald.de
 
- #######################################################
- # all head and neck parts assembled for demonstration #
- #######################################################
+ #####################
+ # neck bottom parts #
+ #####################
 
  Licensed under MIT License (MIT)
 
@@ -37,19 +37,46 @@
 
 */
 
-$exportQuality = false;
+function resolutionLow() = ($exportQuality==true) ? 20 : 10;
+function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 use <..\Parts\HeadParts.scad>
 use <..\Parts\NeckParts.scad>
+use <..\Parts\Stepper5VGear.scad>
 
-FacePlate();
-DrawInnerHead();
-DrawMotorHolder(leftHolder=true, drawMotor=false);
-DrawMotorHolder(leftHolder=false, drawMotor=false);
+bottomYPos = -115;
+neckPipeXPos = 60;
+
+module NeckMotorGear() {
+    top = -115;
+        translate([-15,-15,0]) {
+            scale([3.25,3.25,1]) 
+                linear_extrude(height = 12, center = true, convexity = 100)
+                import("NeckMotorGear.dxf");
+    }
+}
+
+module NeckMotor() {
+    translate([0,neckPipeXPos+69.5,bottomYPos]) 
+    {
+        // Axis
+        cylinder(h=30, r=2.5, $fn=resolutionLow(), center=true); 
+    
+        // Gear
+        NeckMotorGear();
+    }
+}
+
+//DrawInnerHead();
+
+NeckGear();
+
 NeckPipe();
 NeckTop(drawPcbs=false);
-NeckGear(0);
+DrawMotorHolder(leftHolder=true, drawMotor=true);
+DrawMotorHolder(leftHolder=false, drawMotor=true);
 
+NeckMotor();
 
 
 
