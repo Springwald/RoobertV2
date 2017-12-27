@@ -44,7 +44,7 @@ use <..\Parts\HeadParts.scad>
 use <..\Parts\Stepper5VGear.scad>
 
 bottomYPos = -100;
-neckPipeXPos = 88;
+neckPipeXPos = 60;
 
 innerNeckPipeDiameter = 33.8;
 innerNeckPipeHeight=50;
@@ -91,7 +91,7 @@ module NeckPipeHole() {
 }
 
 module NeckGearAdapter() {
-    height= 8;
+    height= 6;
     radius=20;
     color([0,1,1]) {
         translate([0,neckPipeXPos,-10-height/2]) {
@@ -119,13 +119,13 @@ module NeckTop(drawPcbs) {
     
     translate([0,0,bottomYPos]) {
         bottomWidth=204;
-        bottomDepth=38;
+        bottomDepth=35;
         bottomHeight=5;
         difference() {
             intersection() {
-                translate([0, 65.5+bottomDepth/2,-bottomHeight/2]) cube([bottomWidth,50+bottomDepth,bottomHeight],center=true);  // bottom
-                r = 160;
-                translate([0,127-r,0]) cylinder(30,r=r,$fn=resolutionHi(),center=true);  // round back
+                translate([0, 30.5+bottomDepth/2,-bottomHeight/2]) cube([bottomWidth,50+bottomDepth,bottomHeight],center=true);  // bottom
+                r = 260;
+                translate([0,530-r,0]) cylinder(30,r=r,$fn=resolutionHi(),center=true);  // round back
             }
             union() {
                 MotorHolderSkrewHoles(true);
@@ -133,22 +133,22 @@ module NeckTop(drawPcbs) {
                 NeckPipeHole();
                 
                 motorPcbX = 60;
-                translate([motorPcbX, 85, 5]) Stepper5VGearPCB();
-                translate([-motorPcbX, 85, 5]) Stepper5VGearPCB();
-                translate([24+26,54,3]) PCF8574();
-                translate([24-26,54,3]) PCF8574();
-                translate([-30,100,10]) rotate ([0,0,90]) I2CHub();
+                translate([motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
+                translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
+                translate([0+45,35,3]) PCF8574();
+                translate([+-45,35,3]) PCF8574();
+                translate([-30,72,10]) rotate ([0,0,90]) I2CHub();
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=true);
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=false);
             }
         }
         if (drawPcbs) {
             motorPcbX = 60;
-            translate([motorPcbX, 85, 5]) Stepper5VGearPCB();
-            translate([-motorPcbX, 85, 5]) Stepper5VGearPCB();
-            translate([24+26,54,3]) PCF8574();
-            translate([24-26,54,3]) PCF8574();
-            translate([-30,100,10]) rotate ([0,0,90]) I2CHub();
+            translate([motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
+            translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
+            translate([0+45,35,3]) PCF8574();
+            translate([+-45,35,3]) PCF8574();
+            translate([-30,72,10]) rotate ([0,0,90]) I2CHub();
         }
         
     }
@@ -156,14 +156,14 @@ module NeckTop(drawPcbs) {
 
 
 
-//DrawInnerHead();
+DrawInnerHead();
 
 
 
 NeckPipe();
-NeckTop(drawPcbs=false);
-//DrawMotorHolder(leftHolder=true, drawMotor=true);
-//DrawMotorHolder(leftHolder=false, drawMotor=true);
+NeckTop(drawPcbs=true);
+DrawMotorHolder(leftHolder=true, drawMotor=true);
+DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
 
