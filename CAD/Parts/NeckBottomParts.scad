@@ -47,6 +47,11 @@ use <..\Parts\Stepper5VGear.scad>
 bottomYPos = -115;
 neckPipeXPos = 60;
 
+
+
+
+
+
 module NeckMotorGear() {
     top = -115;
         translate([-15,-15,0]) {
@@ -54,6 +59,7 @@ module NeckMotorGear() {
                 linear_extrude(height = 12, center = true, convexity = 100)
                 import("NeckMotorGear.dxf");
     }
+
 }
 
 module NeckMotor() {

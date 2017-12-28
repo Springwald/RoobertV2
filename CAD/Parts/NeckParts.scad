@@ -154,6 +154,17 @@ module NeckTop(drawPcbs) {
     }
 }
 
+module NeckGearMicroSwitchHubble() 
+{  
+    radiusGear = 45;
+    height=5;
+    dummy= -20;
+        difference() 
+        {
+            translate([0,radiusGear,-height * 0.4]) rotate([0,90,90]) scale([1,2,1]) cylinder(h=15, r=height, $fn=resolutionHi(), center=true); 
+            translate([0,radiusGear+5,-5-dummy/2]) cube([100,100,dummy],center=true);
+        }
+}
 
 module NeckGear() {
     top = -113;
@@ -179,6 +190,9 @@ module NeckGear() {
                 NeckGearAdapter(0.5);
             }
         }
+    }
+    translate([0,neckPipeXPos,top]) {
+        NeckGearMicroSwitchHubble();
     }
 }
 
