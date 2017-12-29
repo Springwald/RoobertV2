@@ -276,7 +276,7 @@ module OneMotor(left, axisAngle) {
 }
 
 module InnerHeadEndStopSwitch() {
-    holeRadius = 2.6/2;
+    holeRadius = 3.1/2;
     translate([0,6,-9.5 / 2])rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
     translate([0,6,9.5 / 2]) rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
     cube([6.1,19,21],center=true); 
@@ -308,6 +308,12 @@ module MotorHolder(left, drawMotor)
                 translate([0,0,-MotorHolderHeight/2]) cube([MotorHolderWidth,MotorHolderDepth,MotorHolderHeight],center=true); 
                 rotate([0,90,0]) cylinder(MotorHolderWidth,r=MotorHolderDepth/2,$fn=resolutionHi(),center=true);
                 
+                if (!left) {
+                    translate([-6,13.5,-47]) {
+                        // endstop switch buffer
+                         cube([8,15,21],center=true); 
+                    }
+                }
             }
             union() {
                 translate([left ? 4.5 : -4.5,0,0]) 
@@ -316,7 +322,9 @@ module MotorHolder(left, drawMotor)
                 }
                 // endstop microswitch
                 if (!left) {
-                    translate([-7,10,-47])  InnerHeadEndStopSwitch();
+                    translate([-14,10,-47]) {
+                        InnerHeadEndStopSwitch();
+                    }
                 }
                 // motor cable holder
                 for (i=[0:2]){

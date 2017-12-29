@@ -47,7 +47,7 @@ bottomYPos = -100;
 neckPipeXPos = 60;
 
 innerNeckPipeDiameter = 33.8;
-innerNeckPipeHeight=50;
+innerNeckPipeHeight=45;
 
 module I2CHub() {
      color([0.5,.5,.5]) {
@@ -137,7 +137,7 @@ module NeckTop(drawPcbs) {
                 translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
                 translate([0+45,35,3]) PCF8574();
                 translate([+-45,35,3]) PCF8574();
-                translate([-30,72,10]) rotate ([0,0,90]) I2CHub();
+                translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=true);
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=false);
             }
@@ -148,7 +148,7 @@ module NeckTop(drawPcbs) {
             translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
             translate([0+45,35,3]) PCF8574();
             translate([+-45,35,3]) PCF8574();
-            translate([-30,72,10]) rotate ([0,0,90]) I2CHub();
+            translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
         }
         
     }
@@ -161,8 +161,8 @@ module NeckGearMicroSwitchHubble()
     dummy= -20;
         difference() 
         {
-            translate([0,radiusGear,-height * 0.4]) rotate([0,90,90]) scale([1,2,1]) cylinder(h=15, r=height, $fn=resolutionHi(), center=true); 
-            translate([0,radiusGear+5,-5-dummy/2]) cube([100,100,dummy],center=true);
+            translate([0,-radiusGear,-height * 0.4]) rotate([0,90,90]) scale([1,2,1]) cylinder(h=15, r=height, $fn=resolutionHi(), center=true); 
+            translate([0,-radiusGear+5,-5-dummy/2]) cube([100,100,dummy],center=true);
         }
 }
 
@@ -201,7 +201,7 @@ module NeckGear() {
 NeckGear();
 
 NeckPipe();
-NeckTop(drawPcbs=false);
+NeckTop(drawPcbs=true);
 //DrawMotorHolder(leftHolder=true, drawMotor=true);
 //DrawMotorHolder(leftHolder=false, drawMotor=true);
 

@@ -43,46 +43,128 @@ function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 use <..\Parts\HeadParts.scad>
 use <..\Parts\NeckParts.scad>
 use <..\Parts\Stepper5VGear.scad>
+use <..\Parts\StepperTrinamicQSH4218_35_10_27.scad>
+use <..\Parts\KFL007Bearing35mm.scad>
 
 bottomYPos = -115;
 neckPipeXPos = 60;
 
 
-
-
-
-
 module NeckMotorGear() {
-    top = -115;
-        translate([-15,-15,0]) {
-            scale([3.25,3.25,1]) 
-                linear_extrude(height = 12, center = true, convexity = 100)
-                import("NeckMotorGear.dxf");
+    translate([-15,-15,0]) {
+        scale([3.25,3.25,1]) 
+            linear_extrude(height = 12, center = true, convexity = 100)
+            import("NeckMotorGear.dxf");
     }
-
 }
 
 module NeckMotor() {
-    translate([0,neckPipeXPos+69.5,bottomYPos]) 
+    translate([0,neckPipeXPos+69.5,bottomYPos-51]) 
     {
-        // Axis
-        cylinder(h=30, r=2.5, $fn=resolutionLow(), center=true); 
-    
+        // Motor
+        StepperTrinamicQSH4218_35_10_27();
+        
         // Gear
-        NeckMotorGear();
+        translate([0,0,51]) {
+            NeckMotorGear();
+        }
     }
 }
 
-//DrawInnerHead();
+module NeckBearring(drawHoles) {
+    color([1,0.5,0.2]) translate([0,neckPipeXPos,bottomYPos-1-31.3]) KFL007Bearing35mm(drawHoles); // Bearring
+}
 
-NeckGear();
+module MakerBeamHoles() {
+    width  = 145;
+    depth = 155;
+    radius = 3.1;
+    for(x = [-width/2 : width : width/2]) {
+        for(y = [-depth/2 : depth / 5 : depth/2]) {
+            translate([x,y,-20]) {
+                cylinder(h=30, r=radius/2, $fn=resolutionLow(), center=true); // base body corner
+            }
+        }
+    }
+    for(x = [-width/2 : 30 : width/2]) {
+        for(y = [-depth/2 : depth : depth/2]) {
+            if (y < 10 || (x > 20 || x < -20))  {
+                translate([x,y,-20]) {
+                    cylinder(h=30, r=radius/2, $fn=resolutionLow(), center=true); // base body corner
+                }
+            }
+        }
+    }
+}
+
+module NeckBaseMicroSwitch() {
+    holeRadius = 3.1/2;
+    height = 43;
+    difference() 
+    {
+        translate([10,6.5,2]) cube([20,8,height],center=true);  // microswitch holder
+        
+        translate([9,14,22]) rotate([-90,0,90]) color([0.6,0,.8]) {
+            translate([0,8,-9.5 / 2]) rotate ([0,90,0]) cylinder(30,r=holeRadius,$fn=resolutionLow(),center=true);
+            translate([0,8,9.5 / 2])  rotate ([0,90,0]) cylinder(30,r=holeRadius,$fn=resolutionLow(),center=true);
+            cube([6.2,16,22],center=true); 
+        }
+    }
+}
+
+module NeckBase() {
+    width  = 160;
+    depth = 170;
+    height = 5;
+    
+    zPos = -32;
+    NeckBaseYPosMoveBackwards = 10;
+    
+    elipseHeight = 20;
+    cornerRound = 20;
+        
+    difference() 
+    {
+        translate([0,neckPipeXPos,bottomYPos+zPos])  {
+            
+            translate([0,NeckBaseYPosMoveBackwards,-20]) cube([width-cornerRound,depth,height],center=true); // base body
+            translate([0,NeckBaseYPosMoveBackwards,-20]) cube([width,depth-cornerRound,height],center=true); // base body
+            
+            translate([width/2-cornerRound/2,NeckBaseYPosMoveBackwards + depth/2 - cornerRound/2,-20]) cylinder(h=height, r=cornerRound/2, $fn=resolutionHi(), center=true); // base body corner
+            translate([-width/2+cornerRound/2,NeckBaseYPosMoveBackwards + depth/2 - cornerRound/2,-20]) cylinder(h=height, r=cornerRound/2, $fn=resolutionHi(), center=true); // base body corner
+            translate([-width/2+cornerRound/2,NeckBaseYPosMoveBackwards - depth/2 + cornerRound/2,-20]) cylinder(h=height, r=cornerRound/2, $fn=resolutionHi(), center=true); // base body corner
+            translate([width/2-cornerRound/2,NeckBaseYPosMoveBackwards - depth/2 + cornerRound/2,-20]) cylinder(h=height, r=cornerRound/2, $fn=resolutionHi(), center=true); // base body corner
+        
+                       
+            translate([0,0,-9]) scale([1,.6,1]) color([1,0.2,0.2]) cylinder(h=elipseHeight, r=(width-20)/2, $fn=resolutionHi(), center=true);// elipse body
+            
+            translate([0,-60,0]) NeckBaseMicroSwitch();
+        }
+        union()
+        {
+            NeckMotor();
+            NeckBearring(drawHoles=true);
+            translate([0,neckPipeXPos+NeckBaseYPosMoveBackwards,bottomYPos+zPos]) MakerBeamHoles();
+        }
+    }
+    
+    
+}
+
+if (true) {
+    DrawInnerHead();
+    DrawMotorHolder(leftHolder=true, drawMotor=false);
+    DrawMotorHolder(leftHolder=false, drawMotor=false);
+    NeckGear();
+    NeckTop(drawPcbs=false);
+    NeckBase();
+    NeckBearring(drawHoles=false);
+}
 
 NeckPipe();
-NeckTop(drawPcbs=false);
-DrawMotorHolder(leftHolder=true, drawMotor=true);
-DrawMotorHolder(leftHolder=false, drawMotor=true);
-
 NeckMotor();
+
+
 
 
 
