@@ -25,3 +25,5 @@ module StepperTrinamicQSH4218_35_10_27() {
     translate([+holeDistance/2,-holeDistance/2,0]) cylinder(h=holeHeight, r=holeDiameter/2, $fn=resolutionLow(), center=true); 
     translate([-holeDistance/2,-holeDistance/2,0]) cylinder(h=holeHeight, r=holeDiameter/2, $fn=resolutionLow(), center=true); 
 }
+
+StepperTrinamicQSH4218_35_10_27();

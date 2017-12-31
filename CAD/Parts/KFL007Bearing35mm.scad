@@ -63,3 +63,5 @@ module KFL007Bearing35mm (drawHoles) {
          translate([0,0,-14]) cylinder(h=40, r=10+axisInnerDiameter/2, $fn=resolutionHi(), center=true);  // inner axis  bottom hole
     }
 }
+
+KFL007Bearing35mm(false);
