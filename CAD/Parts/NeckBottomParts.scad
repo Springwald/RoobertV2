@@ -91,7 +91,7 @@ module NeckBearring(drawHoles) {
 module MakerBeamHoles() {
     width  = 147.5;
     depth = 155;
-    radius = 3.1;
+    radius = 3.3;
     for(x = [-width/2 : width : width/2]) {
         for(y = [-depth/2 : depth / 5 : depth/2]) {
             translate([x,y,-20]) {
