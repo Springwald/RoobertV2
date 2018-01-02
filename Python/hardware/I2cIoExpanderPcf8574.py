@@ -79,4 +79,4 @@ if __name__ == "__main__":
 	while True:
 		a = i.getByte()
 		print("read: " +str(a))
-		time.sleep(1)
+		time.sleep(0.5)

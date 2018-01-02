@@ -116,13 +116,13 @@ if __name__ == '__main__':
 	btns.write(0xff)
 	print (btns.read())
 	while True:
-		for i in range(0, 15):
-			dev.write(~i)
+		#for i in range(0, 15):
+			# dev.write(~i)
 			
 			#print (btns.read())
 			#btns.write(0x00)
 			#print (btns.read())
 			#time.sleep(1)
-			#btns.write(0xff)
-			#print (btns.read())
-			#time.sleep(0.5)
+			btns.write(0xff)
+			print (btns.read())
+			time.sleep(0.5)
