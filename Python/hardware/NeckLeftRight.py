@@ -56,11 +56,11 @@ class NeckLeftRight(StepperMotorControl):
 	_i2CMotorDriverAddress		= 0x0f      # the address of the I2CMotorDriver
 
 	_i2cIoExpanderPcf8574		= None      # the I2cIoExpanderPcf8574 the endstop is connected to
-	_endStopBit					= 2         # the bit of the I2cIoExpanderPcf8574 to read the motor endstop
+	_endStopBit					= 128         # the bit of the I2cIoExpanderPcf8574 to read the motor endstop
 
 	_isClosedCircle				= True      # is 0 to maxSteps a full round to the same endstop
 
-	_fastestSpeedDelay			= 0.004     # how fast can the stepper motor go
+	_fastestSpeedDelay			= 0.002     # how fast can the stepper motor go
 	_slowestSpeedDelay			= _fastestSpeedDelay * 10
 	_calibrateSpeedDelay		= _fastestSpeedDelay * 2
 	_actualSpeedDelay			= _slowestSpeedDelay
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
 	for i in range(1, 4):
 		
-		motor.targetPos =motor.MaxSteps * 0.1
+		motor.targetPos =motor.MaxSteps * .6
 		while motor.targetReached == False:
 			#print("wait for target "+ str(motor._targetPos))
 			#motor.Update()
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 		#	print("wait for target "+ str(motor._targetPos))
 		#	time.sleep(1)
 		
-		motor.targetPos = motor.MaxSteps * 0.3
+		motor.targetPos = motor.MaxSteps * 0.4
 		while motor.targetReached == False:
 			#print("wait for target "+ str(motor._targetPos))
 			#motor.Update()
