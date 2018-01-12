@@ -238,7 +238,7 @@ if __name__ == "__main__":
 		
 		#roobert.RandomHeadMovement()
 		
-		#roobert.FollowFace()
+		roobert.FollowFace()
 		#roobert.drive_avoiding_obstacles()
 
 		events = pygame.event.get()
