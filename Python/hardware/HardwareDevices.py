@@ -47,7 +47,7 @@ sys.path.insert(0,my_path + "/../libs" )
 from I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
 #from RelaisI2C import RelaisI2C
 #from Roomba import Roomba
-from PowerManagement import PowerManagement
+#from PowerManagement import PowerManagement
 #from RgbLeds import RgbLeds
 #from HandAndArm import HandAndArm
 
@@ -57,7 +57,7 @@ class HardwareDevices():
 
 	#_roomba								= None
 	#_body_leds							= None
-	_power_management					= None
+	#_power_management					= None
 	
 	#_handArmRight						= None
 	#_handArmLeft						= None

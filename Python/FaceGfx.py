@@ -15,7 +15,7 @@
 #
 #     Licensed under MIT License (MIT)
 #
-#     Copyright (c) 2017 Daniel Springwald | daniel@springwald.de
+#     Copyright (c) 2018 Daniel Springwald | daniel@springwald.de
 #
 #     Permission is hereby granted, free of charge, to any person obtaining
 #     a copy of this software and associated documentation files (the
@@ -53,7 +53,7 @@ sys.path.insert(0,my_path + "/libs" )
 from MultiProcessing import MultiProcessing
 from SharedFloats import SharedFloats
 
-program_path = my_path + "/.."
+program_path = my_path + ""
 
 class FaceGfx(MultiProcessing):
 
@@ -61,8 +61,8 @@ class FaceGfx(MultiProcessing):
 	
 	_visualize	= True
 
-	screenWidth  = 800
-	screenHeight = 480
+	screenWidth  = 1024
+	screenHeight = 600
 	
 	_lastEyeX		= 0
 	_lastEyeY		= 0
@@ -106,9 +106,9 @@ class FaceGfx(MultiProcessing):
 
 		screenInfo = pygame.display.Info()
 		if (screenInfo.current_w > 900):
-			self.lcd = pygame.display.set_mode((800,480))
+			self.lcd = pygame.display.set_mode((self.screenWidth,self.screenHeight))
 		else:
-			self.lcd = pygame.display.set_mode((800,480), FULLSCREEN, 16)
+			self.lcd = pygame.display.set_mode((self.screenWidth,self.screenHeight), FULLSCREEN, 16)
 		
 		self.LoadImages()
 		

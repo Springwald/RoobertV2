@@ -15,7 +15,7 @@
 #
 #     Licensed under MIT License (MIT)
 #
-#     Copyright (c) 2017 Daniel Springwald | daniel@springwald.de
+#     Copyright (c) 2018 Daniel Springwald | daniel@springwald.de
 #
 #     Permission is hereby granted, free of charge, to any person obtaining
 #     a copy of this software and associated documentation files (the
@@ -56,7 +56,7 @@ class NeckLeftRight(StepperMotorControl):
 	_i2CMotorDriverAddress		= 0x0f      # the address of the I2CMotorDriver
 
 	_i2cIoExpanderPcf8574		= None      # the I2cIoExpanderPcf8574 the endstop is connected to
-	_endStopBit					= 2         # the bit of the I2cIoExpanderPcf8574 to read the motor endstop
+	_endStopBit					= 128       # the bit of the I2cIoExpanderPcf8574 to read the motor endstop
 
 	_isClosedCircle				= True      # is 0 to maxSteps a full round to the same endstop
 

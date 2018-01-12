@@ -50,7 +50,7 @@ from hardware.PCF8574 import PCF8574
 from hardware.I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
 from NeckLeftRight import NeckLeftRight
 from NeckUpDown import NeckUpDown
-#from SpeechOutput import SpeechOutput
+from SpeechOutput import SpeechOutput
 #from HandAndArm import HandAndArm
 from FaceGfx import FaceGfx
 from Camera import Camera
@@ -97,16 +97,16 @@ class Roobert:
 		endStop = self.FirstI2cIoExpanderPcf8574
 		
 		self._neckUpDown = NeckUpDown(I2cIoExpanderPcf8574(self.MotorUpDownAdress, useAsInputs=False), endStop)
-		self._neckUpDown.targetPos =int(self._neckUpDown.MaxSteps * 0.85)
+		self._neckUpDown.targetPos =int(self._neckUpDown.MaxSteps * 0.65)
 		
 		self._neckLeftRight = NeckLeftRight(self.MotorLeftRightAdress, endStop)
-		self._neckLeftRight.targetPos = int(self._neckLeftRight.MaxSteps *0.25)
+		self._neckLeftRight.targetPos = int(self._neckLeftRight.MaxSteps *0.49)
 
 		self._speechOutput = SpeechOutput()
 				
 		self._faceGfx = FaceGfx(self.showFace)
 				
-		self._body_leds	= self._hardwareDevices.body_leds
+		#self._body_leds	= self._hardwareDevices.body_leds
 		
 		self._camera = Camera() 		
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
 		
 		#roobert.RandomHeadMovement()
 		
-		roobert.FollowFace()
+		#roobert.FollowFace()
 		#roobert.drive_avoiding_obstacles()
 
 		events = pygame.event.get()
