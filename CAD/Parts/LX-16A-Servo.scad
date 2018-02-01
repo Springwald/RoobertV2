@@ -29,9 +29,6 @@
 
 */
 
-
-$exportQuality = true;
-
 function resolutionLow() = ($exportQuality==true) ? 30 : 10;
 function resolutionHi() = ($exportQuality==true) ? 300 : 20;
 
@@ -172,6 +169,23 @@ module LX16AAxis() {
     
     // Screw hole middle
     translate([0, 0, LX16AAxisDepth/2]) cylinder(h=20, r=3, $fn=resolutionLow(), center=true); 
+}
+
+module LX16AAxisScrewDriverTunnels() {
+    
+    mountingHoleSpacing = 14.0/2;
+    holeHeight=10;
+    holeRadius = 3;
+    translate([0,0,-8]) {
+        translate([+mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([-mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([0,+mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([0,-mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        
+        // Screw hole middle
+    translate([0, 0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=3, $fn=resolutionLow(), center=true); 
+    }
+
 }
 
 module LX16ACubeHolder() {
