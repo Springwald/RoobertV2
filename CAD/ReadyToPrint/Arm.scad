@@ -39,9 +39,9 @@ use <..\Parts\ArmParts.scad>
 
 withSupport = true;
 all=true;
-leftArm = false;
+rightArm = false;
 
-function mirr() = (leftArm==true) ? 0 : 1;
+function mirr() = (rightArm==true) ? 0 : 1;
 
 // Arm01_Shoulder
 if (withSupport == false || all) 
@@ -72,7 +72,6 @@ if (withSupport == true || all)
     color([1,1,0]) // yellow
         translate([-43,20,35.6]) 
             rotate([0,90,0]) Arm05_Middle();
-
 
 // Arm06_Bottom
 if (withSupport == true || all)

@@ -109,6 +109,10 @@ module Arm04_Middle () {
             translate([-4.25,0,23]) cube([22.1,26.75,8],center=true); 
             translate([5.5,0,23]) cube([22.1,21,21],center=true); 
         }
+        
+        // side strength
+        color([1,0,0]) translate([-2.5,-14.5,12]) cube([10,2,30],center=true); 
+        color([1,0,0]) translate([-2.5,14.5,12]) cube([10,2,30],center=true); 
     }
 }
 
@@ -140,6 +144,7 @@ module Arm06_Bottom () {
     depth=20+slip;
     width=41+slip;
     height=15;
+    axisDepth=8;
     
     difference() {
         union() {
@@ -151,11 +156,11 @@ module Arm06_Bottom () {
             translate([0,-depth/2-margin/2,0]) cube([width,margin,height], center=true); // back
             
             //cube([41+margin*2,20+margin*2,margin], center=true);
-            translate([0,0,-12]) LX16ACircleHolder(false);
+            translate([0,0,-axisDepth-2.5]) LX16ACircleHolder(false);
         }
         union() {
-            translate([0,0,-15]) LX16AAxis();
-            translate([0,0,-9.5]) LX16AAxisScrewDriverTunnels();
+            translate([0,0,-axisDepth-5]) LX16AAxis();
+            translate([0,0,-axisDepth-2]) LX16AAxisScrewDriverTunnels();
             translate([0,-0,-3]) cube([16,50,height], center=true); // fan canal
             
             // screw holes
@@ -173,6 +178,7 @@ module Arm06_Bottom () {
 
 //Arm01_Shoulder();
 //Arm03_Top();
-// Arm05_Middle();
-Arm06_Bottom();
+Arm04_Middle();
+//Arm05_Middle();
+//Arm06_Bottom();
 

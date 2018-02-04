@@ -195,7 +195,7 @@ module LX16ACubeHolder() {
                 margin = 1;
                 height = LX16AHeight * 0.65;
                 translate([0,-LX16AHeight/2 + height/2 - margin/2, -LX16AidHolderDepth /2 + LX16AlogoHolderDepth/ 2]) 
-                    cube([LX16AWidth + margin * 2, height + margin, LX16AOuterBodyDepth + LX16AidHolderDepth + LX16AlogoHolderDepth + margin * 2], center=true);
+                    cube([LX16AWidth + margin * 4, height + margin, LX16AOuterBodyDepth + LX16AidHolderDepth + LX16AlogoHolderDepth + margin * 2], center=true);
             }
             LX16A();
         }
@@ -263,13 +263,13 @@ module LX16ACircleHolderSteg() {
 
 //LX16ASkeletonHolder();
 
-//LX16ACubeHolder();
+LX16ACubeHolder();
 //LX16AAxis();
 //LX16A();
 
 
-rotate([0,-90,0])
-LX16ACircleHolderSteg();
+//rotate([0,-90,0])
+//LX16ACircleHolderSteg();
 
 //LX16AScrewDriverTunnels();
 
