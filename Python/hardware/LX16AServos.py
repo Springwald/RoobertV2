@@ -164,9 +164,9 @@ class LX16AServos():
 		self.SerialPort.write(command)
 		self.SerialPort.write(bytes([self.checksum(id, command)]))
 		
-		sleep(0.1)
+		#sleep(0.001)
 		retry=0
-		while retry<100:
+		while retry<10000:
 			if (self.SerialPort.inWaiting() > 0):
 				value=self.SerialPort.read(1)
 				if value != '':
@@ -177,9 +177,14 @@ class LX16AServos():
 							pos2 = int(ord(value))
 							pos2 =  pos1 + 256*pos2 
 							return pos2
-						value=self.SerialPort.read(1)
+						if (self.SerialPort.inWaiting() == 0):
+							sleep(0.1)
+						if (self.SerialPort.inWaiting() > 0):
+							value=self.SerialPort.read(1)
+						else:
+							print("Servo " + str(id) + " value loss!");
 			retry+=1
-			sleep(0.1)
+			sleep(0.0001)
 		print("Servo " + str(id) + " not responding!");
 		return -1;
 		
@@ -196,13 +201,20 @@ if __name__ == "__main__":
 	
 	servos = LX16AServos();
 
-	servos.MoveServo(id=5,speed=10,position=500);
-	sleep(1);
+	#servos.MoveServo(id=5,speed=10,position=500);
+	#sleep(1);
+	
+	for no in range(0, 100):
+		print(str(servos.ReadPos(1)) + "pos " + str(no));
 
-	#for a in range(0, 5):	
-	#	for pos in range(0, 10):
-	#		servos.moveServo(id=5,speed=0,position=550+10*pos)
-	#		sleep(0.2)
+	for pos in range(0, 10):
+		for a in range(0, 5):	
+			servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			sleep(0.01)
+	for pos in range(10, 0, -1):
+		for a in range(0, 5):	
+			servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			sleep(0.01)
 
 	print(str(servos.ReadTemperature(5))+"°C")
 	print(str(servos.ReadVolt(5))+" mVolt")

@@ -55,6 +55,8 @@ from LX16AServos import LX16AServos
 class SmartServoManager(MultiProcessing):
 	
 	_lastUpdateTime	= time.time()
+	_actualSpeedDelay = .002
+	_maxStepsPerSpeedDelay = 20
 	
 	_servos 	= None;
 	servoCount = 0;
@@ -62,7 +64,20 @@ class SmartServoManager(MultiProcessing):
 	__targets	= None; 
 	__values	= None;
 	
+	__shared_ints__				= None
+	
 	_released = False;
+	
+	@property
+	def allTargetsReached(self):
+		#print (self.__shared_ints__.get_value(self.__targets_reached_int__)== 1)
+		return self.__shared_ints__.get_value(self.__targets_reached_int__)== 1
+	@allTargetsReached.setter
+	def allTargetsReached(self, value):
+		if (value == True):
+			self.__shared_ints__.set_value(self.__targets_reached_int__,1)
+		else:
+			self.__shared_ints__.set_value(self.__targets_reached_int__,0)
 
 	def __init__(self, lX16AServos, servoIds):
 		
@@ -73,6 +88,9 @@ class SmartServoManager(MultiProcessing):
 		self._servos = lX16AServos;
 		self.__targets = SharedInts(max_length=self.servoCount);
 		self.__values = SharedInts(max_length=self.servoCount);
+		
+		self.__shared_ints__			= SharedInts(max_length=3)
+		self.__targets_reached_int__	= self.__shared_ints__.get_next_key()
 		
 		self._processName = "SmartServoManager";
 		
@@ -90,18 +108,56 @@ class SmartServoManager(MultiProcessing):
 		#print("update start " + str(time.time()))
 		if (super().updating_ended == True):
 			return
-			
-		for pos in range(0, self.servoCount):
-			id = self._servoIds[pos];
+		
+		timeDiff = time.time() - self._lastUpdateTime
+		if (timeDiff < self._actualSpeedDelay):
+			time.sleep(self._actualSpeedDelay - timeDiff)
+		#time.sleep(self._actualSpeedDelay)
+		#timeDiff = time.time() - self._lastUpdateTime
+		#timeDiff = min(timeDiff, self._actualSpeedDelay * 2)
+		allReached = True
+		#maxSpeed = self._maxStepsPerSecond * timeDiff
+		
+		for i in range(0, self.servoCount):
+			reachedThis = True
+			id = self._servoIds[i];
 			value = self._servos.ReadPos(id);
-			target = self.__targets.get_value(pos);
-			diff = target-value;
-			zone = 3;
-			if (True or diff < -zone or diff > zone):
-				#print ("diff: " + str(diff))
-				diff = max(-20, diff);
-				diff = min(20, diff);
-				self._servos.MoveServo(id, 0, value + diff);
+			diff = int(self.__targets.get_value(i) - value) #self.__values.get_value(i))
+			plus = 0
+			
+			tolerance = 20;
+			
+			if (diff > tolerance):
+				plus = max(1, min(diff, self._maxStepsPerSpeedDelay))
+				reachedThis = False
+			if (diff < -tolerance):
+				plus = min(-1, max(diff , -self._maxStepsPerSpeedDelay))
+				reachedThis = False
+
+			if (reachedThis == False):
+				#print(str(value) + " > " + str(plus));
+				#time.sleep(1);
+				allReached = False
+				newValue = int(value + plus) # self.__values.get_value(i) + plus
+				#self.__values.set_value(i,newValue)
+				#self.setServo(i,newValue)
+				self._servos.MoveServo(id, 0, newValue);
+				
+		self.allTargetsReached = allReached
+		self._lastUpdateTime = time.time()
+			
+			
+		#for pos in range(0, self.servoCount):
+		#	id = self._servoIds[pos];
+		#	value = self._servos.ReadPos(id);
+		#	target = self.__targets.get_value(pos);
+		#	diff = target-value;
+		#	zone = 3;
+		#	if (True or diff < -zone or diff > zone):
+		#		#print ("diff: " + str(diff))
+		#		diff = max(-10, diff);
+		#		diff = min(10, diff);
+		#		self._servos.MoveServo(id, 0, value + diff);
 
 		
 	# resets the servo slowly and waits till it reached its reset position
@@ -111,6 +167,7 @@ class SmartServoManager(MultiProcessing):
 	def MoveServo(self, id, pos):
 		no = self.__getNumberForId(id);
 		self.__targets.set_value(no, pos);
+		self.allTargetsReached = False;
 
 		
 	def __getNumberForId(self, id):
@@ -146,8 +203,33 @@ if __name__ == "__main__":
 	ended = False;
 	servos = LX16AServos();
 	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5]);
-	tester.MoveServo(2,400);
-	time.sleep(5);
-	tester.MoveServo(2,700);
-	time.sleep(5);
+	
+	for no in range(1, 5):
+		tester.MoveServo(no, 500);
+	while (tester.allTargetsReached == False):
+		time.sleep(0.1);
+	
+	tester.MoveServo(1, 200);
+	tester.MoveServo(2, 900);
+	while (tester.allTargetsReached == False):
+		time.sleep(0.1);
+		
+	tester.MoveServo(1, 200);
+	tester.MoveServo(2, 150);
+	while (tester.allTargetsReached == False):
+		time.sleep(0.1);
+		
+	tester.MoveServo(1, 200);
+	tester.MoveServo(2, 900);
+	tester.MoveServo(3, 200);
+	tester.MoveServo(4, 150);
+	while (tester.allTargetsReached == False):
+		time.sleep(0.1);
+	
+	for no in range(1, 5):
+		tester.MoveServo(no, 500);
+	while (tester.allTargetsReached == False):
+		time.sleep(0.1);
+	
+	tester.Release();
 	print("done");
