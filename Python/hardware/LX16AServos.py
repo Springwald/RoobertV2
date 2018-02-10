@@ -41,6 +41,8 @@ from time import sleep
 
 class LX16AServos():
 	
+	_released = False;
+	
 	SerialPort = None;
 
 	CMD_START_BYTE = 0x55
@@ -70,7 +72,7 @@ class LX16AServos():
 		check = bytes([(~(check))&0xff])
 		return check[0]
 
-	def moveServo(self, id, speed, position):
+	def MoveServo(self, id, speed, position):
 
 		if(position < 0):
 			position = 0
@@ -109,15 +111,18 @@ class LX16AServos():
 		sleep(0.1)
 		retry=0
 		while retry<100:
-			value =self.SerialPort.read(1)
-			if value != '':
-				for pos in range(0, 7):
-					if pos == 5:
-						tempture = int(ord(value))
-						return tempture
-					value=self.SerialPort.read(1)
+			if (self.SerialPort.inWaiting() > 0):
+				value =self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 7):
+						if pos == 5:
+							tempture = int(ord(value))
+							return tempture
+						value=self.SerialPort.read(1)
 			retry+=1
 			sleep(0.1)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
 
 
 	def ReadVolt(self, id):
@@ -133,18 +138,21 @@ class LX16AServos():
 		sleep(0.1)
 		retry=0
 		while retry<100:
-			value=self.SerialPort.read(1)
-			if value != '':
-				for pos in range(0, 8):
-					if pos == 5:
-						volt1 = int(ord(value)) 
-					if pos == 6:
-						volt2 = int(ord(value))
-						volt2 =  volt1 + 256*volt2 
-						return volt2
-					value=self.SerialPort.read(1)
+			if (self.SerialPort.inWaiting() > 0):
+				value=self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 8):
+						if pos == 5:
+							volt1 = int(ord(value)) 
+						if pos == 6:
+							volt2 = int(ord(value))
+							volt2 =  volt1 + 256*volt2 
+							return volt2
+						value=self.SerialPort.read(1)
 			retry+=1
 			sleep(0.1)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
 
 	def ReadPos(self, id):
 
@@ -159,30 +167,42 @@ class LX16AServos():
 		sleep(0.1)
 		retry=0
 		while retry<100:
-			value=self.SerialPort.read(1)
-			if value != '':
-				for pos in range(0, 8):
-					if pos == 5:
-						pos1 = int(ord(value)) 
-					if pos == 6:
-						pos2 = int(ord(value))
-						pos2 =  pos1 + 256*pos2 
-						return pos2
-					value=self.SerialPort.read(1)
+			if (self.SerialPort.inWaiting() > 0):
+				value=self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 8):
+						if pos == 5:
+							pos1 = int(ord(value)) 
+						if pos == 6:
+							pos2 = int(ord(value))
+							pos2 =  pos1 + 256*pos2 
+							return pos2
+						value=self.SerialPort.read(1)
 			retry+=1
 			sleep(0.1)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
+		
+	def Release(self):
+		if (self._released == False):
+			print("releasing servos")
+			self.SerialPort.close();
 			
+	def __del__(self):
+		self.Release()
+
+
 if __name__ == "__main__":
 	
 	servos = LX16AServos();
 
-	servos.moveServo(id=5,speed=10,position=600);
+	servos.MoveServo(id=5,speed=10,position=500);
 	sleep(1);
 
-	for a in range(0, 5):	
-		for pos in range(0, 10):
-			servos.moveServo(id=5,speed=0,position=550+10*pos)
-			sleep(0.2)
+	#for a in range(0, 5):	
+	#	for pos in range(0, 10):
+	#		servos.moveServo(id=5,speed=0,position=550+10*pos)
+	#		sleep(0.2)
 
 	print(str(servos.ReadTemperature(5))+"°C")
 	print(str(servos.ReadVolt(5))+" mVolt")
