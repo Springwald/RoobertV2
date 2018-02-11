@@ -50,14 +50,16 @@ module MakerBeamHole() {
     translate([0,0,-height/2])cylinder(h=height, r=radiusScrew/2, $fn=resolutionLow(), center=true); 
 }
 
+
 module Arm01_Shoulder () {
+    holderMargin = 5;
     difference() {
         union() {
             rotate([90,90,-90])
                 LX16ACubeHolder();
             color([1,0,0]) 
-                translate([10,8.4,14]) 
-                    cube([18.6,30.4,2],center=true);
+                translate([10,8.4,12 + holderMargin/2 +2]) 
+                    cube([18.6,30.4,holderMargin],center=true);
         }
         union() {
             translate([10,0,14]) MakerBeamHole();
@@ -82,7 +84,8 @@ module Arm02_Top () {
 }
 
 module Arm03_Top () {
-    difference() {
+    difference() 
+    {
         union() {
             rotate([- 90,0,0])
                 translate([0,2.9,0]) {
@@ -93,7 +96,7 @@ module Arm03_Top () {
         translate([0,0,-3])
             union() {
                 LX16AAxis();
-                translate([0,0,5]) LX16AAxisScrewDriverTunnels();
+                translate([0,0,-4.8]) LX16AAxisScrewDriverTunnels();
             }
     }
 }
@@ -111,8 +114,10 @@ module Arm04_Middle () {
         }
         
         // side strength
-        color([1,0,0]) translate([-2.5,-14.5,12]) cube([10,2,30],center=true); 
-        color([1,0,0]) translate([-2.5,14.5,12]) cube([10,2,30],center=true); 
+        //color([1,0,0]) translate([-2.5,-14.5,12]) cube([10,2,30],center=true); 
+        //color([1,0,0]) translate([-2.5,14.5,12]) cube([10,2,30],center=true); 
+        color([1,0,0]) translate([-4.5,-13.5,5]) rotate([90,-90,0]) BoneStrength(radius=10, length=45, startRound=false);
+         color([1,0,0]) translate([-4.5,13.5,5]) rotate([-90,-90,0]) BoneStrength(radius=10, length=45, startRound=false);
     }
 }
 
@@ -126,7 +131,7 @@ module Arm05_Middle () {
                 translate([0,-12,8]) 
                     LX16ACubeHolder();
             difference() {
-                translate([14.5,0,-16]) cube([18.5,26.75,10],center=true); 
+                translate([14.5,0,-16]) cube([30,26.75,10],center=true); 
                 translate([5.5,0,-14.5]) cube([24,20.5,21],center=true); 
             }
         }
@@ -138,7 +143,7 @@ module Arm05_Middle () {
     }
 }
 
-module Arm06_Bottom () {
+module Arm06_Bottom_QDS_15RO_Servo () {
     slip=0.1;
     margin=2;
     depth=20+slip;
@@ -146,7 +151,8 @@ module Arm06_Bottom () {
     height=15;
     axisDepth=8;
     
-    difference() {
+    difference() 
+    {
         union() {
             translate([0,0,height/2 + margin/2]) cube([width+margin*2,depth+margin*2,margin], center=true); // top
             translate([width/2+margin/2,0,0]) cube([margin,depth+margin*2,height], center=true); // left
@@ -160,7 +166,7 @@ module Arm06_Bottom () {
         }
         union() {
             translate([0,0,-axisDepth-5]) LX16AAxis();
-            translate([0,0,-axisDepth-2]) LX16AAxisScrewDriverTunnels();
+            translate([0,0,-axisDepth-12]) LX16AAxisScrewDriverTunnels();
             translate([0,-0,-3]) cube([16,50,height], center=true); // fan canal
             
             // screw holes
@@ -176,9 +182,75 @@ module Arm06_Bottom () {
     }
 }
 
+module Arm06_Bottom () {
+    
+    innerWidth = 45.5;
+    innerHeight = 20;
+    innerDepth1= 36;
+    
+    centerX = -3;
+    
+    margin=2;
+    height=0;
+   
+    //color([1,0,0]) translate([-4.25,0,innerDepth1/2-10]) cube([innerWidth,innerHeight, innerDepth1], center=true);
+   
+    
+    difference() {
+        union() {
+             rotate([270,0,0]) rotate([0,90,0]) {
+                LX16ACubeHolder();
+                //LX16AAxis(moveUpToServoPos=true);
+            }
+            // filler
+            fillerWidth=8.5;
+            translate([-18.5-fillerWidth/2,0,-4.5]) cube([fillerWidth,innerHeight+6, innerDepth1], center=true);
+            translate([centerX,0,3.7]) LX16ACircleHolder(false);
+            
+            // axis holder
+            translate([-28.5,0,-LX16AxisPlus()]) rotate([0,90,0]) cylinder(h=5, r=3, $fn=resolutionHi(), center=true); 
+            
+            // side clip
+            translate([-27,0,-6]) rotate([0,90,0]) color([0,1,0]) cylinder(h=3, r=14.5/2, $fn=resolutionHi(), center=true); 
+            translate([-27,0,-9.75]) rotate([0,90,0]) color([0,1,0]) cylinder(h=3, r=14.5/2, $fn=resolutionHi(), center=true); 
+        }
+        union() {
+            translate([centerX,0,-4.5]) {
+                LX16AAxis(moveUpToServoPos=false);
+                LX16AAxisScrewDriverTunnels();
+            }
+            
+            // screw hole
+            screwHoleRadius = 1.7;
+            screwHoleXPos = -12.5;
+            translate([screwHoleXPos,0,-LX16AxisPlus()]) rotate([0,90,0]) cylinder(h=40, r=screwHoleRadius, $fn=resolutionLow(), center=true); 
+            translate([screwHoleXPos,0,-LX16AxisPlus()]) rotate([0,90,0]) cylinder(h=20, r=screwHoleRadius*2, $fn=resolutionLow(), center=true); 
+            // small screw holes
+            holeRadius= 1.5/2;
+            holeDistance=15;
+            height1= 24.5;
+            //height2= height/2 - 2.5;
+            translate([-25,holeDistance/2,-LX16AxisPlus()-10+height1]) rotate([0,90,0]) cylinder(h=50, r=holeRadius, $fn=resolutionLow(), center=true); 
+            translate([-25,-holeDistance/2,-LX16AxisPlus()-10+height1]) rotate([0,90,0]) cylinder(h=50, r=holeRadius, $fn=resolutionLow(), center=true); 
+           
+//            translate([-25,holeDistance/2,height2]) rotate([0,90,0]) cylinder(h=50, r=holeRadius, $fn=resolutionLow(), center=true); 
+//            translate([-25,-holeDistance/2,height2]) rotate([0,90,0]) cylinder(h=50, r=holeRadius, $fn=resolutionLow(), center=true); 
+            
+        }
+    }
+    
+    
+    
+     
+    
+    
+
+}
+
 //Arm01_Shoulder();
+//Arm02_Top ();
 //Arm03_Top();
-Arm04_Middle();
+//Arm04_Middle();
 //Arm05_Middle();
-//Arm06_Bottom();
+Arm06_Bottom();
 
