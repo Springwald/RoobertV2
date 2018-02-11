@@ -127,7 +127,7 @@ class SmartServoManager(MultiProcessing):
 			diff = int(self.__targets.get_value(i) - value) #
 			plus = 0
 			
-			tolerance = 20;
+			tolerance = 30;
 			
 			if (diff < tolerance and diff > -tolerance):
 				reachedThis = True
