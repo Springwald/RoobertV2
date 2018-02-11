@@ -39,144 +39,232 @@
 from serial import Serial
 from time import sleep
 
-SerialPort = Serial("/dev/ttyUSB0", baudrate=115200)
-SerialPort.setDTR(1)
-
-CMD_START_BYTE = 0x55
-CMD_SERVO_MOVE_TIME_WRITE_BYTE = 1
-CMD_READ_DATA_BYTE = 3
-CMD_TEMP_READ_BYTE = 26
-CMD_VOLT_READ_BYTE = 27
-CMD_POS_READ_BYTE  = 28
-
-
-TX_DELAY_TIME = 0.00002
-
-
-def checksumWithLength(id, byteArry):
-	check = id + len(byteArry)+2
-	for val in byteArry:
-		check = check + val
-	check = bytes([(~(check))&0xff])
-	return check[0]
+class LX16AServos():
 	
-def checksum(id, byteArry):
-	check = id
-	for val in byteArry:
-		check = check + val
-	check = bytes([(~(check))&0xff])
-	return check[0]
-
-def moveServo(id,speed,position):
-
-	if(position < 0):
-		position = 0
-	if(position > 1000):
-		position = 1000
-	if(speed < 0):
-		speed = 0
-	if(speed > 10000):
-		speed = 10000
-
-	p = [position&0xff, position>>8]
-	s = [speed&0xff, speed>>8]
-    
-	command = bytes([CMD_SERVO_MOVE_TIME_WRITE_BYTE, p[0], p[1], s[0], s[1]]);
-
-	SerialPort.write(bytes([CMD_START_BYTE, CMD_START_BYTE, id, len(command)+2]))
-	SerialPort.write(command)
-	SerialPort.write(bytes([checksumWithLength(id, command)]))
-    
-	sleep(TX_DELAY_TIME)
-	return True
-
-
-def ReadTemperature(id):
-
-	SerialPort.flushInput()
-
-	command = bytes([CMD_READ_DATA_BYTE, CMD_TEMP_READ_BYTE]);
+	_released = False;
 	
-	SerialPort.write(bytes([CMD_START_BYTE, CMD_START_BYTE, id]))
-	SerialPort.write(command)
-	SerialPort.write(bytes([checksum(id, command)]))
-
-	sleep(TX_DELAY_TIME)
+	SerialPort = None;
 	
-	sleep(0.1)
-	retry=0
-	while retry<100:
-		value =SerialPort.read(1)
-		if value != '':
-			for pos in range(0, 7):
-				if pos == 5:
-					tempture = int(ord(value))
-					return tempture
-				value=SerialPort.read(1)
-		retry+=1
+	_shutingDown = False;
+
+	CMD_START_BYTE = 0x55
+	CMD_SERVO_MOVE_TIME_WRITE_BYTE = 1
+	CMD_READ_DATA_BYTE = 3
+	CMD_TEMP_READ_BYTE = 26
+	CMD_VOLT_READ_BYTE = 27
+	CMD_POS_READ_BYTE  = 28
+	CMD_LOAD_OR_UNLOAD_WRITE = 31
+
+	TX_DELAY_TIME = 0.00002
+	
+	def __init__(self):
+		self.SerialPort = Serial("/dev/ttyUSB0", baudrate=115200)
+		self.SerialPort.setDTR(1)
+
+	def checksumWithLength(self, id, byteArry):
+		check = id + len(byteArry)+2
+		for val in byteArry:
+			check = check + val
+		check = bytes([(~(check))&0xff])
+		return check[0]
+		
+	def checksum(self, id, byteArry):
+		check = id
+		for val in byteArry:
+			check = check + val
+		check = bytes([(~(check))&0xff])
+		return check[0]
+
+	def MoveServo(self, id, speed, position):
+		
+		if (self._shutingDown == True):
+			return False
+
+		if(position < 0):
+			position = 0
+		if(position > 1000):
+			position = 1000
+		if(speed < 0):
+			speed = 0
+		if(speed > 10000):
+			speed = 10000
+
+		p = [position&0xff, position>>8]
+		s = [speed&0xff, speed>>8]
+		
+		command = bytes([self.CMD_SERVO_MOVE_TIME_WRITE_BYTE, p[0], p[1], s[0], s[1]]);
+
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id, len(command)+2]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksumWithLength(id, command)]))
+		
+		sleep(self.TX_DELAY_TIME)
+		return True
+
+	def SetServoPower(self, id, on):
+		value = 0;
+		if (on == True):
+			value = 1;
+
+		command = bytes([self.CMD_LOAD_OR_UNLOAD_WRITE, value]);
+
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id, len(command)+2]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksumWithLength(id, command)]))
+		
+		sleep(self.TX_DELAY_TIME)
+		return True
+
+	def ReadTemperature(self, id):
+		
+		if (self._shutingDown == True):
+			return False
+
+		self.SerialPort.flushInput()
+
+		command = bytes([self.CMD_READ_DATA_BYTE, self.CMD_TEMP_READ_BYTE]);
+		
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksum(id, command)]))
+
+		sleep(self.TX_DELAY_TIME)
+		
 		sleep(0.1)
+		retry=0
+		while retry<100:
+			if (self.SerialPort.inWaiting() > 0):
+				value =self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 7):
+						if pos == 5:
+							tempture = int(ord(value))
+							return tempture
+						value=self.SerialPort.read(1)
+			retry+=1
+			sleep(0.1)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
 
 
-def ReadVolt(id):
+	def ReadVolt(self, id):
 
-	SerialPort.flushInput()
-	
-	command = bytes([CMD_READ_DATA_BYTE, CMD_VOLT_READ_BYTE]);
-	
-	SerialPort.write(bytes([CMD_START_BYTE, CMD_START_BYTE, id]))
-	SerialPort.write(command)
-	SerialPort.write(bytes([checksum(id, command)]))
+		if (self._shutingDown == True):
+			return False
 
-	sleep(0.1)
-	retry=0
-	while retry<100:
-		value=SerialPort.read(1)
-		if value != '':
-			for pos in range(0, 8):
-				if pos == 5:
-					volt1 = int(ord(value)) 
-				if pos == 6:
-					volt2 = int(ord(value))
-					volt2 =  volt1 + 256*volt2 
-					return volt2
-				value=SerialPort.read(1)
-		retry+=1
+		self.SerialPort.flushInput()
+		
+		command = bytes([self.CMD_READ_DATA_BYTE, self.CMD_VOLT_READ_BYTE]);
+		
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksum(id, command)]))
+
 		sleep(0.1)
+		retry=0
+		while retry<100:
+			if (self.SerialPort.inWaiting() > 0):
+				value=self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 8):
+						if pos == 5:
+							volt1 = int(ord(value)) 
+						if pos == 6:
+							volt2 = int(ord(value))
+							volt2 =  volt1 + 256*volt2 
+							return volt2
+						value=self.SerialPort.read(1)
+			retry+=1
+			sleep(0.1)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
+		
+	def ShutDown(self, ids):
+		self._shutingDown = True;
+		for id in ids:
+			self.SetServoPower(id, False);
 
-def ReadPos(id):
+	def ReadPos(self, id):
+		
+		if (self._shutingDown == True):
+			return False
 
-	SerialPort.flushInput()
+		self.SerialPort.flushInput()
+		
+		command = bytes([self.CMD_READ_DATA_BYTE, self.CMD_POS_READ_BYTE]);
+		
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksum(id, command)]))
+		
+		#sleep(0.001)
+		retry=0
+		while retry<10000:
+			if (self.SerialPort.inWaiting() > 0):
+				value=self.SerialPort.read(1)
+				if value != '':
+					for pos in range(0, 8):
+						if pos == 5:
+							pos1 = int(ord(value)) 
+						if pos == 6:
+							pos2 = int(ord(value))
+							pos2 =  pos1 + 256*pos2 
+							return pos2
+						if (self.SerialPort.inWaiting() == 0):
+							sleep(0.1)
+						if (self.SerialPort.inWaiting() > 0):
+							value=self.SerialPort.read(1)
+						else:
+							print("Servo " + str(id) + " value loss!");
+			retry+=1
+			sleep(0.0001)
+		print("Servo " + str(id) + " not responding!");
+		return -1;
+		
+	def Release(self):
+		if (self._released == False):
+			print("releasing servos")
+			self.SerialPort.close();
+			
+	def __del__(self):
+		self.Release()
+
+import os
+clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
+
+if __name__ == "__main__":
 	
-	command = bytes([CMD_READ_DATA_BYTE, CMD_POS_READ_BYTE]);
+	servos = LX16AServos();
 	
-	SerialPort.write(bytes([CMD_START_BYTE, CMD_START_BYTE, id]))
-	SerialPort.write(command)
-	SerialPort.write(bytes([checksum(id, command)]))
+	for a in range(1, 6):
+		servos.SetServoPower(a, False)
 	
-	sleep(0.1)
-	retry=0
-	while retry<100:
-		value=SerialPort.read(1)
-		if value != '':
-			for pos in range(0, 8):
-				if pos == 5:
-					pos1 = int(ord(value)) 
-				if pos == 6:
-					pos2 = int(ord(value))
-					pos2 =  pos1 + 256*pos2 
-					return pos2
-				value=SerialPort.read(1)
-		retry+=1
-		sleep(0.1)
+	while (True):
+		clear();
+		for a in range(1, 6):
+			print(str(a) + ": " + str(servos.ReadPos(a)))
+		sleep(0.5);
+	
+	
 
-moveServo(id=1,speed=10,position=20)
-sleep(1)
+	servos.MoveServo(id=6,speed=10,position=420);
+	sleep(1);
+	servos.MoveServo(id=6,speed=10,position=560);
+	sleep(1);
+	
+	#for no in range(0, 100):
+		#print(str(servos.ReadPos(1)) + "pos " + str(no));
 
-#for pos in range(0, 5):
-#	moveServo(id=1,speed=2000,position=585+100*pos)
-#	sleep(0.1)
+	#for pos in range(0, 10):
+		#for a in range(0, 5):	
+			#servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			#sleep(0.01)
+	#for pos in range(10, 0, -1):
+		#for a in range(0, 5):	
+			#servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			#sleep(0.01)
 
-print (str(ReadTemperature(1))+"°C")
-print (str(ReadVolt(1))+" mVolt")
-print (str(ReadPos(1))+" pos")
+	print(str(servos.ReadTemperature(5))+"°C")
+	print(str(servos.ReadVolt(5))+" mVolt")
+	print(str(servos.ReadPos(5))+" pos")
 
