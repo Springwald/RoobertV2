@@ -44,6 +44,8 @@ class LX16AServos():
 	_released = False;
 	
 	SerialPort = None;
+	
+	_shutingDown = False;
 
 	CMD_START_BYTE = 0x55
 	CMD_SERVO_MOVE_TIME_WRITE_BYTE = 1
@@ -51,6 +53,7 @@ class LX16AServos():
 	CMD_TEMP_READ_BYTE = 26
 	CMD_VOLT_READ_BYTE = 27
 	CMD_POS_READ_BYTE  = 28
+	CMD_LOAD_OR_UNLOAD_WRITE = 31
 
 	TX_DELAY_TIME = 0.00002
 	
@@ -73,6 +76,9 @@ class LX16AServos():
 		return check[0]
 
 	def MoveServo(self, id, speed, position):
+		
+		if (self._shutingDown == True):
+			return False
 
 		if(position < 0):
 			position = 0
@@ -95,8 +101,24 @@ class LX16AServos():
 		sleep(self.TX_DELAY_TIME)
 		return True
 
+	def SetServoPower(self, id, on):
+		value = 0;
+		if (on == True):
+			value = 1;
+
+		command = bytes([self.CMD_LOAD_OR_UNLOAD_WRITE, value]);
+
+		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id, len(command)+2]))
+		self.SerialPort.write(command)
+		self.SerialPort.write(bytes([self.checksumWithLength(id, command)]))
+		
+		sleep(self.TX_DELAY_TIME)
+		return True
 
 	def ReadTemperature(self, id):
+		
+		if (self._shutingDown == True):
+			return False
 
 		self.SerialPort.flushInput()
 
@@ -127,6 +149,9 @@ class LX16AServos():
 
 	def ReadVolt(self, id):
 
+		if (self._shutingDown == True):
+			return False
+
 		self.SerialPort.flushInput()
 		
 		command = bytes([self.CMD_READ_DATA_BYTE, self.CMD_VOLT_READ_BYTE]);
@@ -153,8 +178,16 @@ class LX16AServos():
 			sleep(0.1)
 		print("Servo " + str(id) + " not responding!");
 		return -1;
+		
+	def ShutDown(self, ids):
+		self._shutingDown = True;
+		for id in ids:
+			self.SetServoPower(id, False);
 
 	def ReadPos(self, id):
+		
+		if (self._shutingDown == True):
+			return False
 
 		self.SerialPort.flushInput()
 		
@@ -196,25 +229,40 @@ class LX16AServos():
 	def __del__(self):
 		self.Release()
 
+import os
+clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
 
 if __name__ == "__main__":
 	
 	servos = LX16AServos();
-
-	#servos.MoveServo(id=5,speed=10,position=500);
-	#sleep(1);
 	
-	for no in range(0, 100):
-		print(str(servos.ReadPos(1)) + "pos " + str(no));
+	for a in range(1, 6):
+		servos.SetServoPower(a, False)
+	
+	while (True):
+		clear();
+		for a in range(1, 6):
+			print(str(a) + ": " + str(servos.ReadPos(a)))
+		sleep(0.5);
+	
+	
 
-	for pos in range(0, 10):
-		for a in range(0, 5):	
-			servos.MoveServo(id=a,speed=0,position=550+10*pos)
-			sleep(0.01)
-	for pos in range(10, 0, -1):
-		for a in range(0, 5):	
-			servos.MoveServo(id=a,speed=0,position=550+10*pos)
-			sleep(0.01)
+	servos.MoveServo(id=6,speed=10,position=420);
+	sleep(1);
+	servos.MoveServo(id=6,speed=10,position=560);
+	sleep(1);
+	
+	#for no in range(0, 100):
+		#print(str(servos.ReadPos(1)) + "pos " + str(no));
+
+	#for pos in range(0, 10):
+		#for a in range(0, 5):	
+			#servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			#sleep(0.01)
+	#for pos in range(10, 0, -1):
+		#for a in range(0, 5):	
+			#servos.MoveServo(id=a,speed=0,position=550+10*pos)
+			#sleep(0.01)
 
 	print(str(servos.ReadTemperature(5))+"°C")
 	print(str(servos.ReadVolt(5))+" mVolt")
