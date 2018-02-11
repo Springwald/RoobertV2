@@ -21,7 +21,7 @@
  the following conditions:
 
  The above copyright notice and this permission notice shall be
- included in all copies or substantial portions of the Software.
+ included in all copies or substantial portions of the Software. 
 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,44 +39,44 @@ use <..\Parts\ArmParts.scad>
 
 withSupport = true;
 all=true;
-rightArm = false;
+rightArm = true;
 
 function mirr() = (rightArm==true) ? 0 : 1;
 
-// Arm01_Shoulder
-if (withSupport == false || all) 
-    color([1,1,1]) // White
-       translate([10,40,23.6]) 
-            mirror([0,mirr(),0])
-                rotate([-90,0,0]) Arm01_Shoulder();
-
-// Arm02_Top
-if (withSupport == true || all) 
-    color([1,0,0]) // red
-        translate([0,0,23.75]) rotate([0,180,90]) Arm02_Top();
-
-// Arm03_Top
-if (withSupport == true || all) 
-    color([0,1,0]) // green
-        translate([30,0,23.75]) rotate([0,180,0]) Arm03_Top();
-
-// Arm04_Middle
-if (withSupport == true || all) 
-    color([0.5,0.5,1]) // blue
-        translate([-40,-20,18.5]) 
-            mirror([0,mirr(),0])
-                rotate([0,0,180]) Arm04_Middle();
-
-// Arm05_Middle
-if (withSupport == true || all) 
-    color([1,1,0]) // yellow
-        translate([-43,20,35.6]) 
-            rotate([0,90,0]) Arm05_Middle();
+//// Arm01_Shoulder
+//if (withSupport == false || all) 
+//    color([1,1,1]) // White
+//       translate([10,45,23.6]) 
+//            mirror([0,mirr(),0])
+//                rotate([-90,0,0]) Arm01_Shoulder();
+//
+//// Arm02_Top
+//if (withSupport == true || all) 
+//    color([1,0,0]) // red
+//        translate([0,0,23.75]) rotate([0,180,90]) Arm02_Top();
+//
+//// Arm03_Top
+//if (withSupport == true || all) 
+//    color([0,1,0]) // green
+//        translate([30,0,23.75]) rotate([0,180,0]) Arm03_Top();
+//
+//// Arm04_Middle
+//if (withSupport == true || all) 
+//    color([0.5,0.5,1]) // blue
+//        translate([-40,-20,18.5]) 
+//            mirror([0,mirr(),0])
+//                rotate([0,0,180]) Arm04_Middle();
+//
+//// Arm05_Middle
+//if (withSupport == true || all) 
+//    color([1,1,0]) // yellow
+//        translate([-43,20,35.6]) 
+//            rotate([0,90,0]) Arm05_Middle();
 
 // Arm06_Bottom
 if (withSupport == true || all)
     color([0.5,0,0.5]) // purple
-        translate([15,-40,11.75]) 
+        translate([15,-45,11.75]) 
             rotate([0,180,0])
                 Arm06_Bottom();
 

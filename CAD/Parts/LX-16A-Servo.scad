@@ -53,6 +53,8 @@ LX16AstretchHolderHeights = 20;
 
 LX16AStegLengthModification = 0.7;
 
+function LX16AxisPlus() = LX16AHeight / 2 - 10;
+
 module LX16A() 
 {
     // inner body
@@ -112,15 +114,14 @@ module LX16A()
     // bottom screw holes id side
     translate([+LX16AHoleDistanceX/2,-20.5,-10]) cylinder(h=20, r=screwHoleRadius, $fn=resolutionLow(), center=true); 
     translate([-LX16AHoleDistanceX/2,-20.5,-10]) cylinder(h=20, r=screwHoleRadius, $fn=resolutionLow(), center=true);
+
+    LX16AAxis(moveUpToServoPos=true);
     
-    translate([0, LX16AHeight / 2 - 10, 0]) {
-        LX16AAxis();
-    }
-    
-    translate([0, LX16AHeight / 2 - 10, 0]) {
+    translate([0, LX16AHeight / 2 - 10, 0]) 
+    {
         cylinder(h=LX16ADepth+10, r=12, $fn=resolutionLow(), center=true); 
-        LX16AAxis();
     }
+
 }
 
 module LX16AScrewDriverTunnels() 
@@ -145,36 +146,40 @@ module LX16AScrewDriverTunnels()
     translate([-LX16AHoleDistanceX/2,-20.5,-depthFront/2 - height/2 -margin]) cylinder(h=height, r=screwDriverHoleRadius, $fn=resolutionLow(), center=true);
 }
 
-module LX16AAxis() {
+module LX16AAxis(moveUpToServoPos=false) {
     
-    // Axis
-    cylinder(h=LX16AAxisDepth, r=LX16AAxisRadius, $fn=resolutionHi(), center=true); 
+    plus = moveUpToServoPos==true ?  LX16AxisPlus() : 0;
     
-    // Servo Disc holder
-    discHolderHeight=4;
-    translate([0, 0, LX16AAxisDepth/2 - discHolderHeight/2]) cylinder(h=discHolderHeight, r=5, $fn=resolutionLow(), center=true); 
+    translate([0,plus,0]) {    
     
-    // Servo Disk 
-    discHeight = 2;
-    discRadius = 10;
-    translate([0, 0, LX16AAxisDepth/2 + discHeight/2]) cylinder(h=discHeight, r=discRadius, $fn=resolutionLow(), center=true); 
-    
-    mountingHoleSpacing = 14.0/2;
-    holeHeight=10;
-    holeRadius = 1.9;
-    translate([+mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
-    translate([-mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
-    translate([0,+mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
-    translate([0,-mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
-    
-    // Screw hole middle
-    translate([0, 0, LX16AAxisDepth/2]) cylinder(h=20, r=3, $fn=resolutionLow(), center=true); 
+        // Axis
+        cylinder(h=LX16AAxisDepth, r=LX16AAxisRadius, $fn=resolutionHi(), center=true); 
+        
+        // Servo Disc holder
+        discHolderHeight=4;
+        translate([0, 0, LX16AAxisDepth/2 - discHolderHeight/2]) cylinder(h=discHolderHeight, r=5, $fn=resolutionLow(), center=true); 
+        
+        // Servo Disk 
+        discHeight = 2;
+        discRadius = 10;
+        translate([0, 0, LX16AAxisDepth/2 + discHeight/2]) cylinder(h=discHeight, r=discRadius, $fn=resolutionLow(), center=true); 
+        
+        mountingHoleSpacing = 14.0/2;
+        holeHeight=10;
+        holeRadius = 1.9;
+        translate([+mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([-mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([0,+mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        translate([0,-mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
+        
+        // Screw hole middle
+        translate([0, 0, LX16AAxisDepth/2]) cylinder(h=20, r=3, $fn=resolutionLow(), center=true); 
+    }
 }
 
 module LX16AAxisScrewDriverTunnels() {
-    
     mountingHoleSpacing = 14.0/2;
-    holeHeight=10;
+    holeHeight=20;
     holeRadius = 3;
     translate([0,0,-8]) {
         translate([+mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
@@ -243,28 +248,73 @@ module LX16ASkeletonHolder() {
 module LX16ACircleHolderSteg() {
     margin = 3;
     width = 22;
-    width2 = 21;
+    width2 = 25;
+    widthStabilizer = 2.5;
+    marginStabilizer = 2;
     translate([0, LX16AHeight / 2 - 10, 0]) 
-        color([0,0,1])
+        
             difference() 
             {
                 union() {
                     LX16ACircleHolder(inclusiveBottom= true);
                     // connection circle holder
-                    translate([-width/2, 0, LX16AAxisDepth/2 + 3 + margin/2]) cube([width,width2,margin], center=true);
+                    translate([-width/2, 0, LX16AAxisDepth/2 + 3 + margin/2]) cube([width,width2-4,margin], center=true);
                     // connection middle
                     translate([-width + margin/ 2, 0, LX16AStegLengthModification/ 2]) cube([margin,width2,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
                     // connection small axis
                     translate([-width/2, 0, -LX16AAxisDepth/2  - 3.25 + LX16AStegLengthModification]) cube([width,12,margin], center=true);
+                    color([0,1,0]) 
+                        translate([-5.75,0, LX16AAxisDepth/2  + 6.5 - LX16AStegLengthModification])
+                            rotate([0,0,180])
+                                BoneStrength(radius=11, length=32.5, startRound=false);
+                    color([0,1,0]) 
+                        translate([-8,0, -LX16AAxisDepth/2  - 3 - LX16AStegLengthModification])
+                            rotate([180,0,180])
+                                BoneStrength(radius=6.3, length=28, startRound=false);
+                    
+                    // connection middle stabilizer
+                     translate([-width + marginStabilizer/ 2 + margin,width2/2 - widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
+                    translate([-width + marginStabilizer/ 2 + margin, -width2/2 +widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
+                   
                 }
                 color([1,0,1]) LX16AAxis();
+                translate([0,0,14])LX16AAxisScrewDriverTunnels();
+               
             }
 }
 
+module BoneStrength(radius, length, startRound, endRound) {
+    function lengthCalc() = (startRound==true) ? length-radius*2 : length-radius;
+    color([0,1,0]) {
+        difference() {
+            union() {
+                scale([1,1,0.5]) {
+                    
+                    if (startRound == true) {
+                        rotate([0,90,0]) 
+                            cylinder(h=lengthCalc(), r=radius, $fn=resolutionLow(), center=true); 
+                        translate([length/2-radius,0,0]) sphere(radius, $fn=resolutionHi()); 
+                    } else {
+                        
+                            translate([radius/2,0,0])
+                                rotate([0,90,0]) 
+                                    cylinder(h=lengthCalc(), r=radius, $fn=resolutionLow(), center=true); 
+                     
+                    }
+                    translate([-length/2+radius,0,0]) sphere(radius, $fn=resolutionHi()); 
+                }
+            }
+            union() {
+                translate([0,0,-radius/2]) cube([500,500,radius],center=true);
+            }
+        }
+        
+    }
+}
 //LX16ASkeletonHolder();
 
 LX16ACubeHolder();
-//LX16AAxis();
+LX16AAxis(moveUpToServoPos=true);
 //LX16A();
 
 
