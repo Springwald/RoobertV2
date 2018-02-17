@@ -15,7 +15,7 @@
 #
 #     Licensed under MIT License (MIT)
 #
-#     Copyright (c) 2016 Daniel Springwald | daniel@springwald.de
+#     Copyright (c) 2018 Daniel Springwald | daniel@springwald.de
 #
 #     Permission is hereby granted, free of charge, to any person obtaining
 #     a copy of this software and associated documentation files (the
@@ -241,12 +241,12 @@ class StepperMotorControl(MultiProcessing):
 	def calibrateHome(self):
 		self.calibrating = True
 		print ("calibrating motor " + self._motorName )
-		print ("calibrating motor " + self._motorName  + ": free endstop")
+		print ("calibrating motor " + self._motorName  + ": free endstop, isClosedCircle=" + str(self._isClosedCircle));
 		while self._endStop() == True: # backwards if on endstop
-			if (self.actualPos < self.MaxSteps /2) and (self._isClosedCircle == True):
-				self._stepForward()
-			else:
-				self._stepBackwards()
+			#if (self.actualPos < self.MaxSteps /2) and (self._isClosedCircle == True):
+			self._stepForward()
+			#else:
+			#	self._stepBackwards()
 			self._updateMotorSteps()
 			time.sleep(self._calibrateSpeedDelay)
 

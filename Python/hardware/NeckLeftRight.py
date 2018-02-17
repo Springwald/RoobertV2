@@ -60,12 +60,12 @@ class NeckLeftRight(StepperMotorControl):
 
 	_isClosedCircle				= True      # is 0 to maxSteps a full round to the same endstop
 
-	_fastestSpeedDelay			= 0.004     # how fast can the stepper motor go
+	_fastestSpeedDelay			= 0.002     # how fast can the stepper motor go
 	_slowestSpeedDelay			= _fastestSpeedDelay * 10
-	_calibrateSpeedDelay		= _fastestSpeedDelay * 2
+	_calibrateSpeedDelay		= _fastestSpeedDelay * 5
 	_actualSpeedDelay			= _slowestSpeedDelay
 
-	_rampSpeedup				= 1.05      # how fast is the speed of for motor ramping
+	_rampSpeedup				= 1.02      # how fast is the speed of for motor ramping
 	_rampSafeArea				= 40        # prevent to come nearer than this to the endstop
 
 	_stepData					= [0b1001, 0b1000, 0b1010, 0b0010, 0b0110, 0b0100, 0b0101, 0b0001]  # the stepper motor step bits with half steps
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
 	for i in range(1, 4):
 		
-		motor.targetPos =motor.MaxSteps * 0.1
+		motor.targetPos =motor.MaxSteps * 0.3
 		while motor.targetReached == False:
 			#print("wait for target "+ str(motor._targetPos))
 			#motor.Update()
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 		#	print("wait for target "+ str(motor._targetPos))
 		#	time.sleep(1)
 		
-		motor.targetPos = motor.MaxSteps * 0.3
+		motor.targetPos = motor.MaxSteps * 0.5
 		while motor.targetReached == False:
 			#print("wait for target "+ str(motor._targetPos))
 			#motor.Update()

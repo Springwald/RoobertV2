@@ -50,16 +50,16 @@ class NeckUpDown(StepperMotorControl):
 	_i2cIoExpanderPcf8574EndStop = None      	# the I2cIoExpanderPcf8574 the endstop is connected to
 	_endStopBit                  = 64         	# the bit of the I2cIoExpanderPcf8574 to read the motor endstop (1,2,4,8...)
     
-	MaxSteps                     =  300         # how many motor steps can the motor maximum move 
+	MaxSteps                     =  340         # how many motor steps can the motor maximum move 
     
 	_isClosedCircle              = False      	# is 0 to maxSteps a full round to the same endstop
     
-	_fastestSpeedDelay           = 0.001        # how fast can the stepper motor go
+	_fastestSpeedDelay           = 0.005        # how fast can the stepper motor go
 	_slowestSpeedDelay           = _fastestSpeedDelay * 4 
 	_actualSpeedDelay            = _slowestSpeedDelay
     
-	_rampSpeedup                 = 1.01         # how fast is the speed of for motor ramping
-	_rampSafeArea                = 40           # prevent to come nearer than this to the endstop
+	_rampSpeedup                 = 1.05         # how fast is the speed of for motor ramping
+	_rampSafeArea                = 30           # prevent to come nearer than this to the endstop
     
 	_stepData						= [0b00011000, 0b00100100, 0b01000010, 0b10000001]  # the stepper motor step bits (4 bits for each motor)
 	_stepDataOff					= 0
