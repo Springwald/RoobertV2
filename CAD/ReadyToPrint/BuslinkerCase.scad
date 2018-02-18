@@ -42,7 +42,7 @@ function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 
 
-buslinkerWidth=40;
+buslinkerWidth=41;
 buslinkerHeigth=15;
 buslinkerDepth=26;
 
