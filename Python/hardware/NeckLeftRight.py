@@ -130,7 +130,7 @@ class NeckLeftRight(StepperMotorControl):
 
 if __name__ == "__main__":
 	endStop = I2cIoExpanderPcf8574(0x38, useAsInputs=True)
-	motor = NeckLeftRight(0x0f, endStop)
+	motor = NeckLeftRight(0x0b, endStop)
 
 	for i in range(1, 4):
 		

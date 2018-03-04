@@ -56,7 +56,7 @@ class SmartServoManager(MultiProcessing):
 	
 	_lastUpdateTime	= time.time()
 	_actualSpeedDelay = .01
-	_maxStepsPerSpeedDelay = 30
+	_maxStepsPerSpeedDelay = 25
 	
 	_ramp		= 30;
 	
@@ -78,7 +78,7 @@ class SmartServoManager(MultiProcessing):
 		else:
 			self.__shared_ints__.set_value(self.__targets_reached_int__,0)
 
-	def __init__(self, lX16AServos, servoIds, ramp=30, maxSpeed=30):
+	def __init__(self, lX16AServos, servoIds, ramp=30, maxSpeed=25):
 		
 		super().__init__(prio=-20)
 		
@@ -131,8 +131,12 @@ class SmartServoManager(MultiProcessing):
 			
 			if (diff < tolerance and diff > -tolerance):
 				reachedThis = True
+				if (diff != 0):
+					if (super().updating_ended == False):
+						self._servos.MoveServo(id, self._ramp, int(self.__targets.get_value(i)));
 			else:
 				reachedThis = False;
+				
 
 			diff = max(diff, -self._maxStepsPerSpeedDelay);
 			diff = min(diff, self._maxStepsPerSpeedDelay);
@@ -142,6 +146,7 @@ class SmartServoManager(MultiProcessing):
 				newValue = int(value + diff) 
 				if (super().updating_ended == False):
 					self._servos.MoveServo(id, self._ramp, newValue);
+				
 
 		self.allTargetsReached = allReached
 		self._lastUpdateTime = time.time()
@@ -181,12 +186,15 @@ class SmartServoManager(MultiProcessing):
 	#	self._servos.MoveServo(id,0,pos);
 	
 	def MoveToAndWait(self, positions):
+		self.MoveToWithOutWait(positions);
+		while (tester.allTargetsReached == False):
+			time.sleep(0.1);
+			
+	def MoveToWithOutWait(self, positions):
 		for p in range(0,len(positions)):
 			id = positions[p][0]
 			value = positions[p][1]
 			self.MoveServo(id, value)
-		while (tester.allTargetsReached == False):
-			time.sleep(0.1);
 
 	def Release(self):
 		if (self._released == False):
@@ -208,7 +216,7 @@ if __name__ == "__main__":
 
 	ended = False;
 	servos = LX16AServos();
-	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6]);
+	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12]);
 	
 		
 	armHanging 	= [[1,151],[2,168],[3,455],[4,613],[5,471],[6,550]];
@@ -220,6 +228,10 @@ if __name__ == "__main__":
 	ghettoFist2	= [[1,339],[2,138],[3,525],[4,753],[5,116],[6,420]];
 	closeHand	= [[6,420]];
 	openHand	= [[6,550]];
+	
+	tester.MoveServo(12,550);
+	while(True):
+		time.sleep(0.1);
 	
 	tester.MoveToAndWait(armHanging);
 	time.sleep(2);

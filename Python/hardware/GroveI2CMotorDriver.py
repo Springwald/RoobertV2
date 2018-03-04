@@ -85,3 +85,26 @@ class GroveI2CMotorDriver:
 		bus.write_i2c_block_data(self.I2CMotorDriverAdd, self.DirectionSet, [Direction,0])
 		#time.sleep(.002)
 		
+if __name__ == "__main__":
+	tester = GroveI2CMotorDriver(0x0c);
+	
+	tester.MotorSpeedSetAB(100,100);
+	#_stepData = [0b1001, 0b1000, 0b1010, 0b0010, 0b0110, 0b0100, 0b0101, 0b0001]  # the stepper motor step bits with half steps
+	#_stepData = [0b0001, 0b1000, 0b0010, 0b0100]  # the stepper motor step bits with half steps
+	_stepData = [0b0001, 0b1001, 0b1000, 0b1010, 0b0010, 0b0110, 0b0100, 0b0101]
+	
+	speed = 0.005;
+	length = 60;
+	
+	for n in range(0,3):
+		for n in range(0,length):
+			for i in range(0, len(_stepData)):
+				tester.MotorDirectionSet(_stepData[i]);
+				time.sleep(speed);
+		for n in range(0,length):
+			for i in range(len(_stepData)-1,-1,-1):
+				#print(i)
+				tester.MotorDirectionSet(_stepData[i]);
+				time.sleep(speed);
+				
+	tester.MotorSpeedSetAB(0,0);
