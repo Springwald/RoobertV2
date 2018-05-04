@@ -165,7 +165,7 @@ module LX16AAxis(moveUpToServoPos=false) {
         translate([0, 0, LX16AAxisDepth/2 + discHeight/2]) cylinder(h=discHeight, r=discRadius, $fn=resolutionLow(), center=true); 
         
         mountingHoleSpacing = 14.0/2;
-        holeHeight=10;
+        holeHeight=20;
         holeRadius = 1.9;
         translate([+mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
         translate([-mountingHoleSpacing,0, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
@@ -173,7 +173,7 @@ module LX16AAxis(moveUpToServoPos=false) {
         translate([0,-mountingHoleSpacing, LX16AAxisDepth/2+holeHeight/2]) cylinder(h=holeHeight, r=holeRadius, $fn=resolutionLow(), center=true); 
         
         // Screw hole middle
-        translate([0, 0, LX16AAxisDepth/2]) cylinder(h=20, r=3, $fn=resolutionLow(), center=true); 
+        translate([0, 0, LX16AAxisDepth/2]) cylinder(h=40, r=3, $fn=resolutionLow(), center=true); 
     }
 }
 

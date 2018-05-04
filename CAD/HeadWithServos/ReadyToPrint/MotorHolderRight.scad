@@ -37,10 +37,7 @@ $exportQuality = true;
 
 use <..\Parts\HeadParts.scad>
 
-translate([0,0,100]) {
-    DrawMotorHolder(leftHolder=true, drawMotor=false);
-}
-
+DrawMotorHolder(leftHolder=false, drawAxis=false);
 
 
 

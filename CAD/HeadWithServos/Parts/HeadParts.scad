@@ -42,7 +42,7 @@ function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 InnerFaceWidth=180;
 InnerFaceHeight=150;
-InnerFaceDepth=24;
+InnerFaceDepth=22;
 InnerFaceDemoRotation =0;
 
 motorDistance = InnerFaceWidth+12;
@@ -53,7 +53,6 @@ MonitorLCDDepth=7;
 
 cameraPos = [6,10,70.5];
 
-use <Stepper5VGear.scad>
 use <..\..\Parts\LX-16A-Servo.scad>
 
 module Camera() 
@@ -273,18 +272,17 @@ module MotorHolderCableHolder() {
     translate([0,-5,0]) rotate ([0,90,0]) cylinder(40,r=holeRadius,$fn=resolutionLow(),center=true);
 }
 
-
 MotorHolderWidth = 7;
 
 module OneServo(left, drawAxis) {
     if (left) {
          LX16ACubeHolder();
-         if (drawAxis) translate([0,LX16AxisPlus(),0]) rotate([0,0,15])  LX16AAxis(moveUpToServoPos=false);
+         if (drawAxis) translate([0,LX16AxisPlus(),-1]) rotate([0,0,15])  LX16AAxis(moveUpToServoPos=false);
     } else {
         mirror([0,0,1]) 
         {
             LX16ACubeHolder();
-            if (drawAxis) translate([0,LX16AxisPlus(),0])  rotate([0,0,15]) LX16AAxis(moveUpToServoPos=false);
+            if (drawAxis) translate([0,LX16AxisPlus(),-1])  rotate([0,0,15]) LX16AAxis(moveUpToServoPos=false);
         }
     }
 }
@@ -298,7 +296,7 @@ module ServoHolder(left, drawAxis)
     MotorHolderHeight = 200;
     MotorHolderDepth = 42;
 
-    translate([x,0,-7.7]) 
+    translate([x,3,-12]) 
     {
         translate([left ? -15 : 15,0,0]) 
             rotate([90,0,90]) 
@@ -330,12 +328,37 @@ module ServoHolder(left, drawAxis)
 motorHolderTranslation = [0,18,-5];
 motorHolderRotation = [motorHolderAngle-InnerFaceDemoRotation,0,0];
 
+module ServoHeadDiskAdapter(left) 
+{
+    depth = 8.75;
+    color([1,0,0]) {
+        distance = motorDistance-7.5 - depth;
+        x = left ? -distance/2 : distance/2 ;
+        
+        MotorHolderHeight = 200;
+        MotorHolderDepth = 42;
+
+        translate([x,20,-16]) 
+        {
+            rotate([90,0,90]) 
+            {
+                translate([0,LX16AxisPlus(),0]) rotate([0,0,15])  cylinder(depth,r=12,$fn=resolutionHi(),center=true);
+            }
+        
+        }
+}
+}
+
 module DrawInnerHead() {
     rotate([InnerFaceDemoRotation,0,0]) 
     {
         difference() 
         {
-            InnerHead();
+            union() {
+                InnerHead();
+                ServoHeadDiskAdapter(left=true);
+                ServoHeadDiskAdapter(left=false);
+            }
             translate(motorHolderTranslation) 
             {
                 rotate (motorHolderRotation) 
@@ -346,6 +369,7 @@ module DrawInnerHead() {
             }
         }
     }
+
 }
     
 module MotorHolderSkrewHoles(leftHolder) {

@@ -41,12 +41,11 @@ function resolutionLow() = ($exportQuality==true) ? 20 : 10;
 function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 use <..\Parts\HeadParts.scad>
-use <..\Parts\Stepper5VGear.scad>
 
 bottomYPos = -100;
 neckPipeXPos = 60;
 
-innerNeckPipeDiameter = 33.8;
+innerNeckPipeDiameter = 34;
 innerNeckPipeHeight=45;
 
 module I2CHub() {
@@ -107,8 +106,6 @@ module NeckPipe() {
         difference() {
             union() {
                 translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) cylinder(innerNeckPipeHeight,r=innerNeckPipeDiameter/2,$fn=resolutionHi(),center=true); 
-                color([1,0,1]) translate([0,neckPipeXPos,-distancerHeight*1.5]) cylinder(distancerHeight,r=distancerDiameter/2,$fn=resolutionHi(),center=true); 
-                NeckGearAdapter(0);
             }
             NeckPipeHole();
         }
@@ -131,23 +128,12 @@ module NeckTop(drawPcbs) {
                 MotorHolderSkrewHoles(true);
                 MotorHolderSkrewHoles(false);
                 NeckPipeHole();
-                
-                motorPcbX = 60;
-                translate([motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
-                translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
-                translate([0+45,35,3]) PCF8574();
-                translate([+-45,35,3]) PCF8574();
                 translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=true);
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=false);
             }
         }
         if (drawPcbs) {
-            motorPcbX = 60;
-            translate([motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
-            translate([-motorPcbX, 70, 5]) color([1,0,0]) Stepper5VGearPCB();
-            translate([0+45,35,3]) PCF8574();
-            translate([+-45,35,3]) PCF8574();
             translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
         }
         
@@ -166,39 +152,8 @@ module NeckGearMicroSwitchHubble()
         }
 }
 
-module NeckGear() {
-    top = -113;
-    
-    //translate([0,neckPipeXPos,top]) {
-    //    cylinder(4,r=115/2,$fn=resolutionHi(),center=true); 
-    //}
-    
-    scaler = 1.3;
-    difference() 
-    {
-        translate([-0.6,-0.6+neckPipeXPos,top]) {
-            color([0,1,0]) {
-                rotate([0,0,4.5])
-                scale([scaler,scaler,1]) {
-                linear_extrude(height = 6, center = true, convexity = 100)
-                    import("NeckGear.dxf");
-                }
-            }
-        }
-        translate([0,0,top+130]) {
-            scale([1,1,10]){
-                NeckGearAdapter(0.5);
-            }
-        }
-    }
-    translate([0,neckPipeXPos,top]) {
-        NeckGearMicroSwitchHubble();
-    }
-}
 
 //DrawInnerHead();
-
-NeckGear();
 
 NeckPipe();
 NeckTop(drawPcbs=true);
