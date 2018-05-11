@@ -6,6 +6,7 @@ module KFL007Bearing35mm (drawHoles) {
     
     holeDistance = 95;
     holeDiameter = 13;
+    holeScrewDiameter = 6;
     
     axisHeight = 31.3;
     axisOuterDiameter = 35+2*4;
@@ -57,8 +58,8 @@ module KFL007Bearing35mm (drawHoles) {
     }
     
     if (drawHoles) {
-         translate([+holeDistance/2,0,0]) cylinder(h=80, r=holeDiameter/2, $fn=resolutionHi(), center=true); 
-         translate([-holeDistance/2,0,0]) cylinder(h=80, r=holeDiameter/2, $fn=resolutionHi(), center=true); 
+         translate([+holeDistance/2,0,0]) cylinder(h=80, r=holeScrewDiameter/2, $fn=resolutionHi(), center=true); 
+         translate([-holeDistance/2,0,0]) cylinder(h=80, r=holeScrewDiameter/2, $fn=resolutionHi(), center=true); 
          translate([0,0,10]) cylinder(h=60, r=axisInnerDiameter/2, $fn=resolutionHi(), center=true);  // inner axis hole
          translate([0,0,-14]) cylinder(h=40, r=10+axisInnerDiameter/2, $fn=resolutionHi(), center=true);  // inner axis  bottom hole
     }

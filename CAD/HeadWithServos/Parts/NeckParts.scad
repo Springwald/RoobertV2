@@ -41,12 +41,13 @@ function resolutionLow() = ($exportQuality==true) ? 20 : 10;
 function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 use <..\Parts\HeadParts.scad>
+use <..\..\Parts\LX-16A-Servo.scad>
 
 bottomYPos = -100;
 neckPipeXPos = 60;
 
-innerNeckPipeDiameter = 34;
-innerNeckPipeHeight=45;
+innerNeckPipeDiameter = 35;
+innerNeckPipeHeight=55;
 
 module I2CHub() {
      color([0.5,.5,.5]) {
@@ -83,7 +84,7 @@ module PCF8574() {
 }
 
 module NeckPipeHole() {
-    margin=2;
+    margin=2.5;
     translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) {
         cylinder(innerNeckPipeHeight+50,r=innerNeckPipeDiameter/2-margin,$fn=resolutionHi(),center=true); 
     }
@@ -102,12 +103,18 @@ module NeckGearAdapter(margin) {
 module NeckPipe() {
     distancerHeight = 5;
     distancerDiameter=innerNeckPipeDiameter+20;
+    sideHoleHeight=35;
+    sideHoleWidth=10;
     translate([0,0,bottomYPos]) {
         difference() {
             union() {
-                translate([0,neckPipeXPos,-innerNeckPipeHeight/2]) cylinder(innerNeckPipeHeight,r=innerNeckPipeDiameter/2,$fn=resolutionHi(),center=true); 
+                translate([0,neckPipeXPos,-innerNeckPipeHeight/2])
+                    cylinder(innerNeckPipeHeight,r=innerNeckPipeDiameter/2,$fn=resolutionHi(),center=true); 
+                
             }
-            NeckPipeHole();
+            union() {
+                NeckPipeHole();
+            }
         }
     }
 }
@@ -128,37 +135,71 @@ module NeckTop(drawPcbs) {
                 MotorHolderSkrewHoles(true);
                 MotorHolderSkrewHoles(false);
                 NeckPipeHole();
-                translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
+                translate([-52,77,10]) rotate ([0,0,0]) I2CHub();
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=true);
                 translate([0,0,-bottomYPos]) MotorHolderSkrewHoles(leftHolder=false);
-            }
+                MakerBeamAdapterTop();
+           }
         }
         if (drawPcbs) {
-            translate([-30,70,10]) rotate ([0,0,90]) I2CHub();
+            translate([-52,77,10]) rotate ([0,0,0]) I2CHub();
+            MakerBeamAdapterTop();
         }
         
     }
 }
 
-module NeckGearMicroSwitchHubble() 
-{  
-    radiusGear = 45;
-    height=5;
-    dummy= -20;
-        difference() 
-        {
-            translate([0,-radiusGear,-height * 0.4]) rotate([0,90,90]) scale([1,2,1]) cylinder(h=15, r=height, $fn=resolutionHi(), center=true); 
-            translate([0,-radiusGear+5,-5-dummy/2]) cube([100,100,dummy],center=true);
-        }
+module NeckServoConnector() {
+    extraWidth=2;
+    height = 30;
+    translate([0,neckPipeXPos,-innerNeckPipeHeight/2+bottomYPos-innerNeckPipeHeight]) 
+        cylinder(height,r=innerNeckPipeDiameter/2+ extraWidth,$fn=resolutionHi(),center=true); 
 }
+
+
+module MakerBeamAdapterTop() {
+    color([0,0,1]) {
+        translate([0,neckPipeXPos,0]) {
+            translate([-25,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([+25,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+        }
+    }
+}
+
+
+module MakerBeamAdapterBottom() {
+
+    translate([0,neckPipeXPos,-200]) 
+    {
+        difference() {
+        depth = 8.75;
+        color([1,0,0]) {
+            translate([0,0,0]) rotate([0,0,15])  cylinder(depth,r=12,$fn=resolutionHi(),center=true);
+            margin=3;
+            translate([0,0,margin/2]) cube([40,15,depth-margin],center=true);
+         }
+        union() {
+            translate([0,0,-30]) LX16AAxis(moveUpToServoPos=false);
+            translate([0,0,-9])LX16AAxisScrewDriverTunnels();
+            translate([-15,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([+15,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+        }
+    }
+    }
+    
+}
+
+
 
 
 //DrawInnerHead();
 
 NeckPipe();
 NeckTop(drawPcbs=true);
-//DrawMotorHolder(leftHolder=true, drawMotor=true);
-//DrawMotorHolder(leftHolder=false, drawMotor=true);
+MakerBeamAdapterBottom();
+//NeckServoConnector();
+DrawMotorHolder(leftHolder=true, drawMotor=true);
+DrawMotorHolder(leftHolder=false, drawMotor=true);
 
 
 
