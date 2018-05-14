@@ -166,13 +166,40 @@ module MakerBeamAdapterTop() {
     }
 }
 
+module OneServo( drawAxis) {
+      rotate([0,0,90]) LX16ACubeHolder();
+     if (drawAxis) translate([0,LX16AxisPlus(),-1]) rotate([0,0,15])  LX16AAxis(moveUpToServoPos=false);
+    
+}
+
+module BottomServoHolder() {
+    plus1=27;
+    plus2=3;
+    height= 6;
+    difference() {
+        union() {
+            translate([-5,-12,10]) OneServo(drawAxis=false);
+            translate([0,67/2-plus1/2,0]) cube([50,12+plus1,height],center=true);  
+            translate([0,-67/2+plus2/2,0]) cube([50,12+plus2,height],center=true);  
+            translate([21.5,0,0]) cube([7,60,height],center=true);  
+        }
+         union() {
+            // makerbeam holes
+            translate([-15,-67/2,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([15,67/2,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([15,-67/2,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([-15,67/2,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+        }
+    }
+}
+
 
 module MakerBeamAdapterBottom() {
 
     translate([0,neckPipeXPos,-200]) 
     {
         difference() {
-        depth = 8.75;
+        depth = 10;
         color([1,0,0]) {
             translate([0,0,0]) rotate([0,0,15])  cylinder(depth,r=12,$fn=resolutionHi(),center=true);
             margin=3;
@@ -194,12 +221,14 @@ module MakerBeamAdapterBottom() {
 
 //DrawInnerHead();
 
-NeckPipe();
-NeckTop(drawPcbs=true);
+//NeckPipe();
+//NeckTop(drawPcbs=true);
 MakerBeamAdapterBottom();
 //NeckServoConnector();
-DrawMotorHolder(leftHolder=true, drawMotor=true);
-DrawMotorHolder(leftHolder=false, drawMotor=true);
+//DrawMotorHolder(leftHolder=true, drawMotor=true);
+//DrawMotorHolder(leftHolder=false, drawMotor=true);
 
+
+//BottomServoHolder();
 
 
