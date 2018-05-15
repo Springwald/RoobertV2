@@ -190,7 +190,7 @@ class LX16AServos():
 			return False
 
 		self.SerialPort.flushInput()
-		
+
 		command = bytes([self.CMD_READ_DATA_BYTE, self.CMD_POS_READ_BYTE]);
 		
 		self.SerialPort.write(bytes([self.CMD_START_BYTE, self.CMD_START_BYTE, id]))
@@ -198,8 +198,9 @@ class LX16AServos():
 		self.SerialPort.write(bytes([self.checksum(id, command)]))
 		
 		#sleep(0.001)
+		
 		retry=0
-		while retry<10000:
+		while retry<100:
 			if (self.SerialPort.inWaiting() > 0):
 				value=self.SerialPort.read(1)
 				if value != '':
@@ -211,13 +212,13 @@ class LX16AServos():
 							pos2 =  pos1 + 256*pos2 
 							return pos2
 						if (self.SerialPort.inWaiting() == 0):
-							sleep(0.1)
+							sleep(0.00001)
 						if (self.SerialPort.inWaiting() > 0):
 							value=self.SerialPort.read(1)
 						else:
 							print("Servo " + str(id) + " value loss!");
 			retry+=1
-			sleep(0.0001)
+			sleep(0.00001)
 		print("Servo " + str(id) + " not responding!");
 		return -1;
 		
@@ -236,20 +237,29 @@ if __name__ == "__main__":
 	
 	servos = LX16AServos();
 	
-	for a in range(1, 6):
+	for a in range(1, 12):
 		servos.SetServoPower(a, False)
+		
+	r = 0;
 	
 	while (True):
 		clear();
-		for a in range(1, 6):
-			print(str(a) + ": " + str(servos.ReadPos(a)))
-		sleep(0.5);
+		print(r);
+		for a in range(1, 12):
+			p = servos.ReadPos(a);
+			#print(str(a) + ": " + str(p))
+		r = r + 1
+		
+#		print(str(servos.ReadTemperature(5))+"°C")
+#		print(str(servos.ReadVolt(5))+" mVolt")
+#		print(str(servos.ReadPos(5))+" pos")
+		#sleep(0.5);
 	
 	
 
-	servos.MoveServo(id=6,speed=10,position=420);
+	servos.MoveServo(id=6,speed=5,position=420);
 	sleep(1);
-	servos.MoveServo(id=6,speed=10,position=560);
+	servos.MoveServo(id=6,speed=5,position=560);
 	sleep(1);
 	
 	#for no in range(0, 100):
@@ -264,7 +274,5 @@ if __name__ == "__main__":
 			#servos.MoveServo(id=a,speed=0,position=550+10*pos)
 			#sleep(0.01)
 
-	print(str(servos.ReadTemperature(5))+"°C")
-	print(str(servos.ReadVolt(5))+" mVolt")
-	print(str(servos.ReadPos(5))+" pos")
+
 

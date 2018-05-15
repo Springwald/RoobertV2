@@ -71,7 +71,7 @@ class Arms():
 
 	def __init__(self, leftHandOpen, leftHandClose, rightHandOpen, rightHandClose):
 		self._servos = LX16AServos();
-		self._servoManager = SmartServoManager(lX16AServos=self._servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=0, maxSpeed=35);
+		self._servoManager = SmartServoManager(lX16AServos=self._servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=80, maxSpeed=15);
 		self._leftHandOpen = leftHandOpen;
 		self._leftHandClose = leftHandClose;
 		self._rightHandOpen = rightHandOpen;
@@ -138,12 +138,16 @@ if __name__ == "__main__":
 	tester.WaitTillTargetsReached();
 	time.sleep(1);
 	
+	#while(True):
+	#	time.sleep(1)
+	#	print("sleep")
+
 	
 	tester.SetArm(gesture=Arms._strechSide, left=True);
 	tester.WaitTillTargetsReached();
 	
-	tester.SetArm(gesture=Arms._lookHand, left=False);
-	tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._lookHand, left=False);
+	#tester.WaitTillTargetsReached();
 	
 	tester.SetArm(gesture=Arms._strechSide, left=True);
 	tester.SetArm(gesture=Arms._strechSide, left=False);

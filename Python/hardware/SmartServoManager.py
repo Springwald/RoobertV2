@@ -55,7 +55,7 @@ from LX16AServos import LX16AServos
 class SmartServoManager(MultiProcessing):
 	
 	_lastUpdateTime	= time.time()
-	_actualSpeedDelay = .01
+	_actualSpeedDelay = .001
 	_maxStepsPerSpeedDelay = 25
 	
 	_ramp		= 30;
@@ -78,7 +78,7 @@ class SmartServoManager(MultiProcessing):
 		else:
 			self.__shared_ints__.set_value(self.__targets_reached_int__,0)
 
-	def __init__(self, lX16AServos, servoIds, ramp=30, maxSpeed=25):
+	def __init__(self, lX16AServos, servoIds, ramp=0, maxSpeed=25):
 		
 		super().__init__(prio=-20)
 		
@@ -105,6 +105,7 @@ class SmartServoManager(MultiProcessing):
 			
 		super().StartUpdating()
 		
+		
 	def Update(self):
 		#print("update start " + str(time.time()))
 		if (super().updating_ended == True):
@@ -114,14 +115,12 @@ class SmartServoManager(MultiProcessing):
 		if (timeDiff < self._actualSpeedDelay):
 			time.sleep(self._actualSpeedDelay - timeDiff)
 		allReached = True
-
 		
 		for i in range(0, self.servoCount):
 			
 			if (super().updating_ended == True):
 				return
-			
-			
+				
 			id = self._servoIds[i];
 			value = self._servos.ReadPos(id);
 			diff = int(self.__targets.get_value(i) - value) #
@@ -137,7 +136,6 @@ class SmartServoManager(MultiProcessing):
 			else:
 				reachedThis = False;
 				
-
 			diff = max(diff, -self._maxStepsPerSpeedDelay);
 			diff = min(diff, self._maxStepsPerSpeedDelay);
 							
@@ -187,8 +185,8 @@ class SmartServoManager(MultiProcessing):
 	
 	def MoveToAndWait(self, positions):
 		self.MoveToWithOutWait(positions);
-		while (tester.allTargetsReached == False):
-			time.sleep(0.1);
+		while (self.allTargetsReached == False):
+			time.sleep(0.01);
 			
 	def MoveToWithOutWait(self, positions):
 		for p in range(0,len(positions)):
@@ -211,14 +209,12 @@ class SmartServoManager(MultiProcessing):
 
 def exit_handler():
 	tester.Release()
-
-if __name__ == "__main__":
-
+	
+def bigTest():
 	ended = False;
 	servos = LX16AServos();
 	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12]);
-	
-		
+
 	armHanging 	= [[1,151],[2,168],[3,455],[4,613],[5,471],[6,550]];
 	wink1 		= [[1,374],[2,451],[3,693],[4,816],[5,565]];
 	wink2 		= [[1,192],[2,678],[3,888],[4,872],[5,509]];
@@ -229,31 +225,36 @@ if __name__ == "__main__":
 	closeHand	= [[6,420]];
 	openHand	= [[6,550]];
 	
-	tester.MoveServo(12,550);
+	#tester.MoveServo(4,613);
+	
+	
 	while(True):
-		time.sleep(0.1);
 	
-	tester.MoveToAndWait(armHanging);
-	time.sleep(2);
+		tester.MoveToAndWait(armHanging);
+		time.sleep(2);
 	
-	tester.MoveToAndWait(closeHand);
-	time.sleep(1);
-	tester.MoveToAndWait(openHand);
-	time.sleep(1);
+		tester.MoveToAndWait(closeHand);
+		time.sleep(1);
+		tester.MoveToAndWait(openHand);
+		time.sleep(1);
 	
-
-	if (True):
+		tester.MoveToAndWait(strechSide);
+		time.sleep(2);
+	
 		for wink in range(0,2):
 			tester.MoveToAndWait(wink1);
 			tester.MoveToAndWait(wink2);
+	
+		#print('sleep')
+		#time.sleep(0.1);
 			
 		tester.MoveToAndWait(armHanging);
 		time.sleep(1);
 			
 		tester.MoveToAndWait(strechSide);
 		time.sleep(2);
-		tester.MoveToAndWait(lookHand);
-		time.sleep(2);
+		#tester.MoveToAndWait(lookHand);
+		#time.sleep(2);
 		
 		tester.MoveToAndWait(armHanging);
 		time.sleep(1);
@@ -267,3 +268,21 @@ if __name__ == "__main__":
 	
 	tester.Release();
 	print("done");
+	
+def SingleTest():
+	ended = False;
+	servos = LX16AServos();
+	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=60, maxSpeed=25);
+
+	while(True):
+		tester.MoveServo(4,613);
+		while (tester.allTargetsReached == False):
+			time.sleep(0.1);
+		
+		tester.MoveServo(4,848);
+		while (tester.allTargetsReached == False):
+			time.sleep(0.1);
+
+if __name__ == "__main__":
+	#SingleTest();
+	bigTest();
