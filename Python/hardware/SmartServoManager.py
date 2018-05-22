@@ -252,7 +252,8 @@ def bigTest():
 	#tester.MoveServo(4,613);
 	
 	
-	while(True):
+	#while(True):
+	if (True):
 	
 		tester.MoveToAndWait(lookFront + armHanging);
 		time.sleep(1);
@@ -302,6 +303,7 @@ def SingleTest():
 		tester.MoveServo(15,500+plus);
 		while (tester.allTargetsReached == False):
 			time.sleep(0.1);
+
 
 
 if __name__ == "__main__":

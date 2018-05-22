@@ -225,6 +225,7 @@ class LX16AServos():
 	def Release(self):
 		if (self._released == False):
 			print("releasing servos")
+			self.ShutDown();
 			self.SerialPort.close();
 			
 	def __del__(self):
