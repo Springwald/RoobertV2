@@ -212,7 +212,7 @@ class LX16AServos():
 							pos2 =  pos1 + 256*pos2 
 							return pos2
 						if (self.SerialPort.inWaiting() == 0):
-							sleep(0.00001)
+							sleep(0.01)
 						if (self.SerialPort.inWaiting() > 0):
 							value=self.SerialPort.read(1)
 						else:
@@ -242,7 +242,7 @@ if __name__ == "__main__":
 		
 	r = 0;
 	
-	while (True):
+	while (False):
 		clear();
 		print(r);
 		for a in range(1, 12):
@@ -256,10 +256,10 @@ if __name__ == "__main__":
 		#sleep(0.5);
 	
 	
+	plus = 0;
 
-	servos.MoveServo(id=6,speed=5,position=420);
-	sleep(1);
-	servos.MoveServo(id=6,speed=5,position=560);
+	servos.MoveServo(id=14,speed=0,position=500+plus);
+	servos.MoveServo(id=13,speed=0,position=500-plus);
 	sleep(1);
 	
 	#for no in range(0, 100):
