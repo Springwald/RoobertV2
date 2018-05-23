@@ -199,17 +199,17 @@ module MakerBeamAdapterBottom() {
     translate([0,neckPipeXPos,-200]) 
     {
         difference() {
-        depth = 10;
+        depth = 13;
         color([1,0,0]) {
             translate([0,0,0]) rotate([0,0,15])  cylinder(depth,r=12,$fn=resolutionHi(),center=true);
-            margin=3;
-            translate([0,0,margin/2]) cube([40,15,depth-margin],center=true);
+            margin=8;
+            translate([0,0,margin/2]) cube([44,15,depth-margin],center=true);
          }
         union() {
             translate([0,0,-30]) LX16AAxis(moveUpToServoPos=false);
-            translate([0,0,-9])LX16AAxisScrewDriverTunnels();
-            translate([-15,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
-            translate([+15,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([0,0,-12])LX16AAxisScrewDriverTunnels();
+            translate([-17,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
+            translate([+17,0,0]) cylinder(30,r=3.1/2,$fn=resolutionLow(),center=true); 
         }
     }
     }

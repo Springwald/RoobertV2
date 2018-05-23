@@ -43,17 +43,26 @@ use <..\Parts\HeadParts.scad>
 use <..\Parts\NeckParts.scad>
 use <..\Parts\NeckBottomParts.scad>
 
-FacePlate();
-DrawInnerHead();
-DrawMotorHolder(leftHolder=true, drawMotor=false);
-DrawMotorHolder(leftHolder=false, drawMotor=false);
+
+
+//NeckBearring(drawHoles=false);
+NeckBase();
+
+
+
 
 NeckPipe();
 NeckTop(drawPcbs=false);
-NeckGear(0);
-NeckMotor();
-NeckBearring(drawHoles=false);
-NeckBase();
+MakerBeamAdapterBottom();
+//NeckServoConnector();
+
+FacePlate();
+DrawInnerHead();
+DrawMotorHolder(leftHolder=true, drawAxis=true);
+DrawMotorHolder(leftHolder=false, drawAxis=true);
+translate([30,70,-250]) {
+    BottomServoHolder();
+}
 
     
 
