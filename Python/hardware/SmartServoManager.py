@@ -55,16 +55,20 @@ from LX16AServos import LX16AServos
 class SmartServoManager(MultiProcessing):
 	
 	_lastUpdateTime	= time.time()
-	_actualSpeedDelay = .001
-	_maxStepsPerSpeedDelay = 25
+	_actualSpeedDelay = .006
+	_maxStepsPerSpeedDelay = 1
 	
-	_ramp		= 30;
+	_ramp				= 10;
 	
-	_servos 	= None;
-	servoCount = 0;
-	_servoIds	= [];
-	__targets	= None; 
-	__shared_ints__				= None
+	_servos 			= None;
+	servoCount 			= 0;
+	_servoIds			= [];
+	__targets			= None; 
+	__values			= None; 
+	
+	__shared_ints__		= None
+	
+	_nextServoToReadPos = 0;
 	
 	_released = False;
 	
@@ -78,7 +82,7 @@ class SmartServoManager(MultiProcessing):
 		else:
 			self.__shared_ints__.set_value(self.__targets_reached_int__,0)
 
-	def __init__(self, lX16AServos, servoIds, ramp=0, maxSpeed=25):
+	def __init__(self, lX16AServos, servoIds, ramp=0, maxSpeed=1):
 		
 		super().__init__(prio=-20)
 		
@@ -86,6 +90,7 @@ class SmartServoManager(MultiProcessing):
 		self._servoIds = servoIds;
 		self._servos = lX16AServos;
 		self.__targets = SharedInts(max_length=self.servoCount);
+		self.__values  = SharedInts(max_length=self.servoCount);
 		
 		self._ramp = ramp;
 		self._maxStepsPerSpeedDelay = maxSpeed;
@@ -99,7 +104,7 @@ class SmartServoManager(MultiProcessing):
 		for pos in range(0, self.servoCount):
 			id = self._servoIds[pos];
 			value = self._servos.ReadPos(id);
-			#self.__values.set_value(pos, value);
+			self.__values.set_value(pos, value);
 			self.__targets.set_value(pos, value);
 			#print(self.__values.get_value(pos));
 			
@@ -115,36 +120,51 @@ class SmartServoManager(MultiProcessing):
 		if (timeDiff < self._actualSpeedDelay):
 			time.sleep(self._actualSpeedDelay - timeDiff)
 		allReached = True
-		
+
 		for i in range(0, self.servoCount):
 			
 			if (super().updating_ended == True):
 				return
 				
 			id = self._servoIds[i];
-			value = self._servos.ReadPos(id);
-			diff = int(self.__targets.get_value(i) - value) #
+			
+			if (False and self._nextServoToReadPos == i):
+			#if (id == 13 or id == 12):
+				value = self._servos.ReadPos(id)
+				self.__values.set_value(i, value);
+				#print(str(i)+ " " + str(value))
+			else:
+				value = self.__values.get_value(i);
+
+			diff = int(self.__targets.get_value(i) - value) 
 			plus = 0
 			
-			tolerance = 30;
+			tolerance = 10;
 			
 			if (diff < tolerance and diff > -tolerance):
 				reachedThis = True
-				if (diff != 0):
-					if (super().updating_ended == False):
-						self._servos.MoveServo(id, self._ramp, int(self.__targets.get_value(i)));
+				#if (diff != 0):
+				#	if (super().updating_ended == False):
+				#		l = 1
+						#newValue = int(self.__targets.get_value(i))
+						#self._servos.MoveServo(id, self._ramp, newValue)
+						#self.__values.set_value(i, newValue)
 			else:
 				reachedThis = False;
 				
 			diff = max(diff, -self._maxStepsPerSpeedDelay);
 			diff = min(diff, self._maxStepsPerSpeedDelay);
-							
+
 			if (reachedThis == False):
 				allReached = False
 				newValue = int(value + diff) 
 				if (super().updating_ended == False):
 					self._servos.MoveServo(id, self._ramp, newValue);
-				
+					self.__values.set_value(i, newValue)
+
+		self._nextServoToReadPos = self._nextServoToReadPos + 1
+		if (self._nextServoToReadPos >= self.servoCount):
+			self._nextServoToReadPos = 0
 
 		self.allTargetsReached = allReached
 		self._lastUpdateTime = time.time()
@@ -213,48 +233,46 @@ def exit_handler():
 def bigTest():
 	ended = False;
 	servos = LX16AServos();
-	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12]);
+	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],ramp=0, maxSpeed=1);
 
-	armHanging 	= [[1,151],[2,168],[3,455],[4,613],[5,471],[6,550]];
-	wink1 		= [[1,374],[2,451],[3,693],[4,816],[5,565]];
-	wink2 		= [[1,192],[2,678],[3,888],[4,872],[5,509]];
-	strechSide	= [[1,299],[2,249],[3,663],[4,660],[5,848]];
-	lookHand	= [[1,592],[2, 90],[3,361],[4,787],[5,795]];
-	ghettoFist1	= [[1,105],[2,140],[3,525],[4,910],[5,116],[6,420]];
-	ghettoFist2	= [[1,339],[2,138],[3,525],[4,753],[5,116],[6,420]];
-	closeHand	= [[6,420]];
-	openHand	= [[6,550]];
+	armHanging 		= [[1,151],[2,168],[3,455],[4,613],[5,471],[6,550]];
+	wink1 			= [[1,374],[2,451],[3,693],[4,816],[5,565]];
+	wink2 			= [[1,192],[2,678],[3,888],[4,872],[5,509]];
+	strechSide		= [[1,299],[2,249],[3,663],[4,660],[5,848]];
+	lookHand		= [[1,592],[2, 90],[3,361],[4,787],[5,795]];
+	ghettoFist1		= [[1,105],[2,140],[3,525],[4,910],[5,116],[6,420]];
+	ghettoFist2		= [[1,339],[2,138],[3,525],[4,753],[5,116],[6,420]];
+	
+	closeHand		= [[6,420]];
+	openHand		= [[6,550]];
+	
+	lookRightHand	= [[13,500-150],[14,500+150],[15,500-250]];
+	lookFront		= [[13,500],[14,500],[15,500]];
 	
 	#tester.MoveServo(4,613);
 	
 	
-	while(True):
+	#while(True):
+	if (True):
 	
-		tester.MoveToAndWait(armHanging);
-		time.sleep(2);
+		tester.MoveToAndWait(lookFront + armHanging);
+		time.sleep(1);
 	
 		tester.MoveToAndWait(closeHand);
-		time.sleep(1);
 		tester.MoveToAndWait(openHand);
-		time.sleep(1);
-	
-		tester.MoveToAndWait(strechSide);
+
+		tester.MoveToAndWait(strechSide + lookRightHand);
 		time.sleep(2);
 	
 		for wink in range(0,2):
 			tester.MoveToAndWait(wink1);
 			tester.MoveToAndWait(wink2);
-	
-		#print('sleep')
-		#time.sleep(0.1);
-			
+
 		tester.MoveToAndWait(armHanging);
 		time.sleep(1);
 			
 		tester.MoveToAndWait(strechSide);
 		time.sleep(2);
-		#tester.MoveToAndWait(lookHand);
-		#time.sleep(2);
 		
 		tester.MoveToAndWait(armHanging);
 		time.sleep(1);
@@ -272,16 +290,21 @@ def bigTest():
 def SingleTest():
 	ended = False;
 	servos = LX16AServos();
-	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=60, maxSpeed=25);
+	tester = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],ramp=0, maxSpeed=1);
+
+	plus = 100;
 
 	while(True):
-		tester.MoveServo(4,613);
-		while (tester.allTargetsReached == False):
-			time.sleep(0.1);
 		
-		tester.MoveServo(4,848);
+		plus = - plus;
+		
+		tester.MoveServo(13,500+plus);
+		tester.MoveServo(14,500-plus);
+		tester.MoveServo(15,500+plus);
 		while (tester.allTargetsReached == False):
 			time.sleep(0.1);
+
+
 
 if __name__ == "__main__":
 	#SingleTest();
