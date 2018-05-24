@@ -48,7 +48,7 @@ import pygame
 from pygame.locals import *
 import random
 
-sys.path.insert(0,my_path + "/libs" )
+sys.path.insert(0,my_path + "/DanielsRasPiPythonLibs/multitasking/" )
 
 from MultiProcessing import MultiProcessing
 from SharedFloats import SharedFloats
@@ -105,7 +105,7 @@ class FaceGfx(MultiProcessing):
 		pygame.mixer.quit() # to prevent conflicts with speech output (audio device busy)
 
 		screenInfo = pygame.display.Info()
-		if (screenInfo.current_w > 900):
+		if (screenInfo.current_w > 1100):
 			self.lcd = pygame.display.set_mode((self.screenWidth,self.screenHeight))
 		else:
 			self.lcd = pygame.display.set_mode((self.screenWidth,self.screenHeight), FULLSCREEN, 16)
@@ -159,12 +159,12 @@ class FaceGfx(MultiProcessing):
 		return surface
 
 	def LoadImages(self):
-		self.mouthGfx = self.LoadImage('mouth.png', False)
-		self.glassesGfx = self.LoadImage( 'glasses.png', False)
+		self.mouthGfx = self.LoadImage('mouth.png', True)
+		self.glassesGfx = self.LoadImage( 'glasses.png', True)
 		self.eyeBallGfx = self.LoadImage( 'eye_ball.png', True)
-		self.eyeWhiteGfx  = self.LoadImage( 'eye_white.png',False)
-		self.eyeBrowLeftGfx  = self.LoadImage( 'eyebrow_left.png', False)
-		self.eyeBrowRightGfx  = self.LoadImage( 'eyebrow_right.png', False)
+		self.eyeWhiteGfx  = self.LoadImage( 'eye_white.png',True)
+		self.eyeBrowLeftGfx  = self.LoadImage( 'eyebrow_left.png', True)
+		self.eyeBrowRightGfx  = self.LoadImage( 'eyebrow_right.png', True)
 		
 	def PaintEye(self,leftFactor):
 		eyeCenterX = self.screenWidth * (0.5 + leftFactor * 0.158)
@@ -214,7 +214,7 @@ class FaceGfx(MultiProcessing):
 					self.mouthPosYTarget = 0
 
 		rotatedMouth = self.rot_center(self.mouthGfx, self.mouthAngle)
-		self.lcd.blit(rotatedMouth, (self.screenWidth / 2 - self.mouthGfx.get_width() / 2, self.screenHeight * 0.7 + self.mouthPosY))
+		self.lcd.blit(rotatedMouth, (self.screenWidth / 2 - self.mouthGfx.get_width() / 2, self.screenHeight * 0.67 + self.mouthPosY))
 
 	def Update(self):
 		if (super().updating_ended == True):
