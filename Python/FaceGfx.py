@@ -204,7 +204,7 @@ class FaceGfx(MultiProcessing):
 		speedY = 3
 		if (self.mouthPosY > self.mouthPosYTarget + speedY):
 			self.mouthPosY = self.mouthPosY-speedY
-		else:
+		else: 
 			if (self.mouthPosY < self.mouthPosYTarget - speedY):
 				self.mouthPosY = self.mouthPosY+speedY
 			else:
