@@ -42,9 +42,20 @@ import time, os, sys
 my_file = os.path.abspath(__file__)
 my_path ='/'.join(my_file.split('/')[0:-1])
 
-sys.path.insert(0,my_path + "/../libs" )
+sys.path.insert(0,my_path + "/" )
 
-from I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
+sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/multitasking" )
+sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/hardware" )
+
+from MultiProcessing import *
+from array import array
+from SharedInts import SharedInts
+from SharedFloats import SharedFloats
+from LX16AServos import LX16AServos
+from SmartServoManager import SmartServoManager
+from Arms import Arms
+
+#from I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
 #from RelaisI2C import RelaisI2C
 #from Roomba import Roomba
 #from PowerManagement import PowerManagement
@@ -59,6 +70,8 @@ class HardwareDevices():
 	#_body_leds							= None
 	#_power_management					= None
 	
+	_arms								 = None
+	
 	#_handArmRight						= None
 	#_handArmLeft						= None
 	
@@ -68,6 +81,8 @@ class HardwareDevices():
 	#power_relais_bit_arms_right 		= 5
 	#power_relais_bit_arms_left 			= 7
 	#power_relais_bit_sens3d_servos 		= 6
+	
+	_servoManager						= None
 	
 	__singleton							= None
 	_released 							= False
@@ -108,14 +123,19 @@ class HardwareDevices():
 	#		self._handArmRight = HandAndArm(rightArm = True, i2cAdress=0x40, busnum=1, power_relais = self.relais, relais_bit=self.power_relais_bit_arms_right)
 	#	return self._handArmRight
 
-	#@property
-	#def hand_arm_left(self):
-	#	if (self._handArmLeft == None):
-	#		self._handArmLeft = HandAndArm(rightArm = False, i2cAdress=0x41, busnum=1, power_relais = self.relais, relais_bit=self.power_relais_bit_arms_left)
-	#	return self._handArmLeft
+	@property
+	def arms(self):
+		if (self._arms == None):
+			self._arms = Arms(self._servoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
+		return self._arms;
 
 	def __init__(self):
-			return
+		
+		servos = LX16AServos();
+		self._servoManager = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],ramp=0, maxSpeed=1);
+		
+		
+		return
 
 	def Release(self):
 		if (self._released == False):
@@ -125,8 +145,8 @@ class HardwareDevices():
 			#if (self._body_leds != None):
 			#	self._body_leds.Release()
 				
-			#if (self._handArmRight != None):
-			#	self._handArmRight.Release()
+			if (self._arms != None):
+				self._arms.Release()
 				
 			#if (self._handArmLeft != None):
 			#	self._handArmLeft.Release()
@@ -156,11 +176,9 @@ if __name__ == "__main__":
 	#print ("roomba: " + str(devices.roomba))
 	#print ("body_leds: " + str(devices.body_leds))
 	#print ("power_management: " + str(devices.power_management))
+	
+	devices.arms.SetArm(gesture=Arms._strechSide, left=True);
+	devices.arms.WaitTillTargetsReached();
 
-	devices.hand_arm_right.gestureGreet();
-
-	for i in range(1,3):
-		time.sleep(1)
-
-	#devices.Release()
+	devices.Release()
 

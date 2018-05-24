@@ -52,6 +52,7 @@ sys.path.insert(0,my_path + "/DanielsRasPiPythonLibs/multitasking/" )
 
 from MultiProcessing import MultiProcessing
 from SharedFloats import SharedFloats
+from SharedInts import SharedInts
 
 program_path = my_path + ""
 
@@ -67,7 +68,7 @@ class FaceGfx(MultiProcessing):
 	_lastEyeX		= 0
 	_lastEyeY		= 0
 	
-	speaking = False
+	__speaking = False
 	
 	mouthGfx = None
 	mouthAngle = 0
@@ -86,6 +87,8 @@ class FaceGfx(MultiProcessing):
 	delaySeconds = 1.0 / 10 #10 fps
 
 	__shared_floats__			= SharedFloats(max_length=2)
+	__shared_ints__				= SharedInts(max_length=1)
+	__speaking_int__ 			= __shared_ints__.get_next_key()
 	__eye_x_float__ 			= __shared_floats__.get_next_key()
 	__eye_y_float__ 			= __shared_floats__.get_next_key()
 
@@ -137,6 +140,17 @@ class FaceGfx(MultiProcessing):
 	@eyeX.setter
 	def eyeX(self, value):
 		self.__shared_floats__.set_value(self.__eye_x_float__,value)
+	
+	@property
+	def speaking(self):
+		return	self.__shared_ints__.get_value(self.__speaking_int__) ==1
+	@speaking.setter
+	def speaking(self, value):
+		if (value == True):
+			self.__shared_ints__.set_value(self.__speaking_int__,1)
+		else:
+			self.__shared_ints__.set_value(self.__speaking_int__,0)
+		
 		
 	@property
 	def eyeY(self):

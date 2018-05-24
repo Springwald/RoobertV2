@@ -39,12 +39,11 @@
 from __future__ import division
 import time, sys, os
 
-import atexit
-
 my_file = os.path.abspath(__file__)
 my_path ='/'.join(my_file.split('/')[0:-1])
 
-sys.path.insert(0,my_path + "/../libs" )
+sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/multitasking")
+sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/hardware")
 
 from MultiProcessing import *
 from array import array
@@ -53,9 +52,10 @@ from SharedFloats import SharedFloats
 from LX16AServos import LX16AServos
 from SmartServoManager import SmartServoManager
 
+import atexit
+
 class Arms():
 
-	_servos = None;
 	_servoManager = None;
 	_released = False;
 	
@@ -69,9 +69,9 @@ class Arms():
 	
 	_leftServoCorrection = [-50,20,0,0,0,50];
 
-	def __init__(self, leftHandOpen, leftHandClose, rightHandOpen, rightHandClose):
-		self._servos = LX16AServos();
-		self._servoManager = SmartServoManager(lX16AServos=self._servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=0, maxSpeed=1);
+	def __init__(self, smartServoManager, leftHandOpen, leftHandClose, rightHandOpen, rightHandClose):
+		
+		self._servoManager = smartServoManager;
 		self._leftHandOpen = leftHandOpen;
 		self._leftHandClose = leftHandClose;
 		self._rightHandOpen = rightHandOpen;
@@ -117,7 +117,6 @@ class Arms():
 			self.SetHand(opened=True, left=True);
 			self.WaitTillTargetsReached();
 			self._servoManager.Release();
-			self._servos.Release();
 
 	def __del__(self):
 		self.Release()
@@ -128,7 +127,11 @@ def exit_handler():
 if __name__ == "__main__":
 
 	ended = False;
-	tester = Arms(leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
+	
+	servos = LX16AServos();
+	servoManager = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=0, maxSpeed=1);
+	
+	tester = Arms(servoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
 	tester.SetHand(opened=False, left= True);
 	tester.SetHand(opened=False, left= False);
 	tester.WaitTillTargetsReached();

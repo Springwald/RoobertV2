@@ -41,8 +41,8 @@ import os, sys
 my_file = os.path.abspath(__file__)
 my_path ='/'.join(my_file.split('/')[0:-1])
 
-sys.path.insert(0,my_path + "/libs" )
-sys.path.insert(0,my_path + "/libs/opencv" )
+sys.path.insert(0,my_path + "/DanielsRasPiPythonLibs/multitasking" )
+sys.path.insert(0,my_path + "/DanielsRasPiPythonLibs/opencv" )
 
 
 # import the necessary packages

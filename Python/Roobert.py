@@ -36,8 +36,6 @@
 #     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #     DEALINGS IN THE SOFTWARE.
 
-
-
 import os, sys
 from os.path import abspath
 
@@ -46,18 +44,22 @@ from random import randrange, uniform
 import math
 import pygame
 
-from hardware.PCF8574 import PCF8574
-from hardware.I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
-from NeckLeftRight import NeckLeftRight
-from NeckUpDown import NeckUpDown
-from SpeechOutput import SpeechOutput
-#from HandAndArm import HandAndArm
+from DanielsRasPiPythonLibs.hardware.PCF8574 import PCF8574
+from DanielsRasPiPythonLibs.hardware.I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
+from DanielsRasPiPythonLibs.speech.SpeechOutput import SpeechOutput
+
+#from hardware.NeckLeftRight import NeckLeftRight
+#from hardware.NeckUpDown import NeckUpDown
+
+from Camera import Camera
 from FaceGfx import FaceGfx
 from Camera import Camera
 #from Roomba import Roomba
 #from RgbLeds import *
 #from RelaisI2C import RelaisI2C
+
 from hardware.HardwareDevices import HardwareDevices
+from hardware.Arms import Arms
 from _thread import start_new_thread
 
 import atexit
@@ -93,16 +95,16 @@ class Roobert:
 
 		self._hardwareDevices = HardwareDevices.singleton()
 
-		self.FirstI2cIoExpanderPcf8574 = I2cIoExpanderPcf8574(self.I2cIoExpanderPcf8574Adress, useAsInputs=True)
-		endStop = self.FirstI2cIoExpanderPcf8574
+		#self.FirstI2cIoExpanderPcf8574 = I2cIoExpanderPcf8574(self.I2cIoExpanderPcf8574Adress, useAsInputs=True)
+		#endStop = self.FirstI2cIoExpanderPcf8574
 		
-		self._neckUpDown = NeckUpDown(I2cIoExpanderPcf8574(self.MotorUpDownAdress, useAsInputs=False), endStop)
-		self._neckUpDown.targetPos =int(self._neckUpDown.MaxSteps * 0.65)
+		#self._neckUpDown = NeckUpDown(I2cIoExpanderPcf8574(self.MotorUpDownAdress, useAsInputs=False), endStop)
+		#self._neckUpDown.targetPos =int(self._neckUpDown.MaxSteps * 0.65)
 		
-		self._neckLeftRight = NeckLeftRight(self.MotorLeftRightAdress, endStop)
-		self._neckLeftRight.targetPos = int(self._neckLeftRight.MaxSteps *0.49)
+		#self._neckLeftRight = NeckLeftRight(self.MotorLeftRightAdress, endStop)
+		#self._neckLeftRight.targetPos = int(self._neckLeftRight.MaxSteps *0.49)
 
-		self._speechOutput = SpeechOutput()
+		self._speechOutput = SpeechOutput(soundcard="plughw:1", voice="-vmb-de2"); 
 				
 		self._faceGfx = FaceGfx(self.showFace)
 				
@@ -124,10 +126,10 @@ class Roobert:
 			if (self._faceGfx != None):
 				self._faceGfx.Release()
 				
-			if (self._neckUpDown != None):
-				self._neckUpDown.Release()
-			if (self._neckLeftRight != None):
-				self._neckLeftRight.Release()
+			#if (self._neckUpDown != None):
+			#	self._neckUpDown.Release()
+			#if (self._neckLeftRight != None):
+			#	self._neckLeftRight.Release()
 				
 			if (self._hardwareDevices != None):
 				self._hardwareDevices.Release()
@@ -135,8 +137,8 @@ class Roobert:
 			self._ended = True
 			
 	def Update(self):
-		if (self.showFace== True):
-			self._faceGfx.speaking = self._speechOutput.speaking
+		if (self.showFace == True):
+			self._faceGfx.speaking = self._speechOutput.IsSpeaking();
 			
 	def RandomHeadMovement(self):
 		if (self._neckLeftRight.targetReached==True):
@@ -149,30 +151,25 @@ class Roobert:
 	def Greet(self):
 		print("greetings!");
 		self._speechOutput.Speak("Guten Tag.")
-		self._speechOutput.Speak("Mein Name ist Robert")
-		self._hardwareDevices.hand_arm_right.gestureGreet()
-		while (self._speechOutput.speaking==True):
+		self._hardwareDevices.arms.SetArm(gesture=Arms._strechSide, left=True);
+		while (self._speechOutput.IsSpeaking()==True):
+			self.Update()
+			time.sleep(0.1)
+		self._speechOutput.Speak("Mein Name ist Robert", wait=False)
+		while (self._speechOutput.IsSpeaking()==True):
+			self.Update()
+			time.sleep(0.1)
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True);
+		self._hardwareDevices.arms.WaitTillTargetsReached();
+		while (self._speechOutput.IsSpeaking()==True):
 			time.sleep(1)
 		self._speechOutput.Speak("Ich freue mich, Sie kennen zu lernen")
-		self._hardwareDevices.hand_arm_right.gesturePointForward()
-		while (self._speechOutput.speaking==True):
-			time.sleep(1)
-		self._hardwareDevices.hand_arm_right.home()
+		#self._hardwareDevices.hand_arm_right.gesturePointForward()
+		while (self._speechOutput.IsSpeaking()==True):
+			self.Update()
+			time.sleep(0.1)
+		#self._hardwareDevices.hand_arm_right.home()
 			
-	def drive_avoiding_obstacles(self):
-		#print (self._sens3d.nearest)
-		if (self._sens3d.nearest > 40):
-			self._roomba.move(3)
-			#time.sleep(0.5)
-		else:
-			if (self._sens3d.x_weight < 0.45):
-				self._roomba.rotate(-20)
-			else:
-				if (self._sens3d.x_weight > 0.55):
-					self._roomba.rotate(20)
-				else:
-					self._roomba.rotate(180 * self._rotate)
-					self._rotate = self._rotate * -1
 					
 	def RotateDemoForPhoto(self):
 		self._hardwareDevices.hand_arm_right.gesturePointForward();
@@ -195,10 +192,10 @@ class Roobert:
 			self._camera.ResetFace()
 			diffX = (faceX - 0.5) 
 			diffY = (faceY - 0.5) 
-			if (math.fabs(diffX ) > 0.1):
-				self._neckLeftRight.targetPos = self._neckLeftRight.targetPos - int(diffX * 100)
-			if (math.fabs(diffY ) > 0.1):
-				self._neckUpDown.targetPos = self._neckUpDown.targetPos - int(diffY * 100)
+			#if (math.fabs(diffX ) > 0.1):
+			#	self._neckLeftRight.targetPos = self._neckLeftRight.targetPos - int(diffX * 100)
+			#if (math.fabs(diffY ) > 0.1):
+			#	self._neckUpDown.targetPos = self._neckUpDown.targetPos - int(diffY * 100)
 			
 			self._faceGfx.SetEyePos(faceX,faceY)
 		else:
