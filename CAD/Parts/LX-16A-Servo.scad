@@ -34,7 +34,7 @@ function resolutionHi() = ($exportQuality==true) ? 300 : 20;
 
 LX16AHeight = 45.2;
 LX16AWidth = 24.7;
-LX16ADepth = 31;
+LX16ADepth = 30.75;
 
 LX16AOuterBodyDepth = LX16ADepth+2;
 LX16AOuterBodyHeight = 30;
@@ -283,12 +283,12 @@ module LX16ACircleHolderSteg() {
             }
 }
 
-module BoneStrength(radius, length, startRound, endRound) {
+module BoneStrength(radius, length, startRound, endRound, scaler=0.5) {
     function lengthCalc() = (startRound==true) ? length-radius*2 : length-radius;
     color([0,1,0]) {
         difference() {
             union() {
-                scale([1,1,0.5]) {
+                scale([1,1,scaler]) {
                     
                     if (startRound == true) {
                         rotate([0,90,0]) 
@@ -313,8 +313,8 @@ module BoneStrength(radius, length, startRound, endRound) {
 }
 //LX16ASkeletonHolder();
 
-LX16ACubeHolder();
-LX16AAxis(moveUpToServoPos=true);
+// LX16ACubeHolder();
+//LX16AAxis(moveUpToServoPos=true);
 //LX16A();
 
 

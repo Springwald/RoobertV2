@@ -8,9 +8,9 @@
 
  Project website: http://roobert.springwald.de
 
- #############
- # arm parts #
- #############
+ ################################
+ # arm parts (stronger version) #
+ ################################
 
  Licensed under MIT License (MIT)
 
@@ -41,6 +41,23 @@ function resolutionLow() = ($exportQuality==true) ? 20 : 10;
 function resolutionHi() = ($exportQuality==true) ? 300 : 50;
 
 use <LX-16A-Servo.scad>
+use <LX-16A-Servo-Adapter.scad>
+
+
+module MakerBeam(length=200) 
+{
+    margin = 0.6;
+    
+    holeLength = 100;
+    
+    translate([0,holeLength/2,-10]) rotate([90,0,0]) cylinder(h=holeLength, r=1.6, $fn=resolutionLow(), center=true); 
+    translate([0,holeLength/2,20]) rotate([90,0,0]) cylinder(h=holeLength, r=1.6, $fn=resolutionLow(), center=true); 
+    
+    translate([0,0,5]) rotate([0,90,0]) cylinder(h=holeLength, r=1.6, $fn=resolutionLow(), center=true); 
+  
+    color([1,0,0]) cube([10+margin,10+margin,length],true);
+}
+
 
 module MakerBeamHole() {
     height = 40;
@@ -51,36 +68,25 @@ module MakerBeamHole() {
 }
 
 
-module Arm01_Shoulder () {
-    holderMargin = 5;
+module Arm01_Shoulder () {    
+    color([0,1,1]) DoubleHolderOuter();
+    
     difference() {
-        union() {
-            rotate([90,90,-90])
-                LX16ACubeHolder();
-            color([1,0,0]) 
-                translate([10,8.4,12 + holderMargin/2 +2]) 
-                    cube([18.6,30.4,holderMargin],center=true);
+        translate([-29,12.5,-19]) 
+        {
+            color([1,1,1]) cube([15,25,105], center=true);
+            translate([-4,7,0]) rotate([0,0,45]) color([1,1,1]) cube([25,15,105], center=true);
+            translate([-13.5,15,0]) rotate([0,90,45]) color([1,1,1]) cube([20,25,50], center=true);
         }
+
         union() {
-            translate([10,0,14]) MakerBeamHole();
-            translate([10,17,14]) MakerBeamHole();
+            translate([-46,25,-19]) rotate([0,90,45]) color([1,0,1]) MakerBeam(screwHolesTop=true, screwHolesMiddle=true);
         }
     }
 }
 
 module Arm02_Top () {
-    difference() {
-        union() {
-            rotate([0,90,0])
-                translate([0,-12.5,0]) 
-                    LX16ACircleHolderSteg();
-            LX16ACircleHolder(false);
-        }
-        union() {
-            translate([0,0,-3]) 
-                LX16AAxis();
-        }
-    }
+    DoubleHolderInner();
 }
 
 module Arm03_Top () {
@@ -248,7 +254,8 @@ module Arm06_Bottom () {
 }
 
 Arm01_Shoulder();
-//Arm02_Top ();
+Arm02_Top ();
+
 //Arm03_Top();
 //Arm04_Middle();
 //Arm05_Middle();
