@@ -130,6 +130,14 @@ if __name__ == "__main__":
 	
 	servos = LX16AServos();
 	servoManager = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=0, maxSpeed=1);
+	servoManager.SetMaxStepsPerUpdate(3,2);
+	servoManager.SetMaxStepsPerUpdate(4,2);
+	servoManager.SetMaxStepsPerUpdate(5,2);
+	servoManager.SetMaxStepsPerUpdate(6,3);
+	servoManager.SetMaxStepsPerUpdate(9,2);
+	servoManager.SetMaxStepsPerUpdate(10,2);
+	servoManager.SetMaxStepsPerUpdate(11,2);
+	servoManager.SetMaxStepsPerUpdate(12,3);
 	
 	tester = Arms(servoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
 	tester.SetHand(opened=False, left= True);
