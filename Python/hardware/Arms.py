@@ -54,6 +54,8 @@ from SmartServoManager import SmartServoManager
 
 import atexit
 
+clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
+
 class Arms():
 
 	_servoManager = None;
@@ -68,21 +70,59 @@ class Arms():
 	_ghettoFist2	= [[1,339],[2,138],[3,525],[4,753],[5,116]];
 	
 	_leftServoCorrection = [-50,20,0,0,0,50];
+	
+	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
+		self._servoManager = smartServoManager
+		self._leftHandOpen = leftHandOpen
+		self._leftHandClose = leftHandClose
+		self._rightHandOpen = rightHandOpen
+		self._rightHandClose = rightHandClose
+		self.DefineArms()
+		
+		#self.SetArm(gesture=Arms._armHanging, left=False);
+		#self.SetHand(opened=True, left=False);
+		#self.SetArm(gesture=Arms._armHanging, left=True);
+		#self.SetHand(opened=True, left=True);
+		#self.WaitTillTargetsReached();
+		
+	def DefineArms(self):
+		# right arm
+		self._servoManager.AddMasterServo(servoId=1, centeredValue=370);
+		self._servoManager.AddSlaveServo(servoId=2, masterServoId=1, reverseToMaster=-1, centeredValue=608);
+		self._servoManager.AddMasterServo(servoId=3, centeredValue=685);
+		self._servoManager.AddSlaveServo(servoId=4, masterServoId=3, reverseToMaster=-1, centeredValue=352);
+		self._servoManager.AddMasterServo(servoId=5, centeredValue=510);
+		self._servoManager.AddMasterServo(servoId=6, centeredValue=460);
+		self._servoManager.AddMasterServo(servoId=7, centeredValue=495);
+		self._servoManager.AddMasterServo(servoId=8, centeredValue=500);
 
-	def __init__(self, smartServoManager, leftHandOpen, leftHandClose, rightHandOpen, rightHandClose):
-		
-		self._servoManager = smartServoManager;
-		self._leftHandOpen = leftHandOpen;
-		self._leftHandClose = leftHandClose;
-		self._rightHandOpen = rightHandOpen;
-		self._rightHandClose = rightHandClose;
-		
-		self.SetArm(gesture=Arms._armHanging, left=False);
-		self.SetHand(opened=True, left=False);
-		self.SetArm(gesture=Arms._armHanging, left=True);
-		self.SetHand(opened=True, left=True);
-		self.WaitTillTargetsReached();
-		
+	def PrintRightArmValues(self):
+		self._servoManager.SetReadOnly(servoId=1, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=2, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=3, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=4, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=5, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=6, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=7, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=8, isReadOnly=True);
+		self._servoManager.Start()
+		while(True):
+			out = ""
+			# print all readonly servos
+			for a in range(0, self._servoManager.servoCount):
+				id = self._servoManager._servoIds[a]
+				if (self._servoManager._isReadOnly[a]==True):
+					p = self._servoManager.ReadServo(id)
+					#if (p != -1):
+					out = out  + str(id) + ": " + str(p) + "\r\n"
+					
+			# print only the master servos in in copy format
+			
+			## push to screen
+			clear()
+			print(out)
+			time.sleep(0.1)
+
 	def SetArm(self, gesture, left):
 		for p in range(0,len(gesture)):
 			id = gesture[p][0]
@@ -99,9 +139,9 @@ class Arms():
 	def SetHand(self, opened, left):
 		if (left==True):
 			if (opened==True):
-				self._servoManager.MoveServo(12,self._leftHandOpen);
+				self._servoManager.MoveServo(12,self._leftHandOpen)
 			else:
-				self._servoManager.MoveServo(12,self._leftHandClose);
+				self._servoManager.MoveServo(12,self._leftHandClose)
 		else:
 			if (opened==True):
 				self._servoManager.MoveServo(6,self._rightHandOpen);
@@ -128,18 +168,22 @@ if __name__ == "__main__":
 
 	ended = False;
 	
-	servos = LX16AServos();
-	servoManager = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12],ramp=0, maxSpeed=1);
-	servoManager.SetMaxStepsPerUpdate(3,2);
-	servoManager.SetMaxStepsPerUpdate(4,2);
-	servoManager.SetMaxStepsPerUpdate(5,2);
-	servoManager.SetMaxStepsPerUpdate(6,3);
-	servoManager.SetMaxStepsPerUpdate(9,2);
-	servoManager.SetMaxStepsPerUpdate(10,2);
-	servoManager.SetMaxStepsPerUpdate(11,2);
-	servoManager.SetMaxStepsPerUpdate(12,3);
+	servos = LX16AServos()
+	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
+	tester = Arms(servoManager)
+	tester.PrintRightArmValues()
 	
-	tester = Arms(servoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
+	plus = 100
+	servoManager.Start()
+	while(True):
+		plus = - plus
+		#tester._servoManager.MoveServo(1,400+plus)
+		tester._servoManager.MoveServo(3,600+plus)
+		while (tester._servoManager.allTargetsReached == False):
+			time.sleep(0.1)
+	
+	
+	
 	tester.SetHand(opened=False, left= True);
 	tester.SetHand(opened=False, left= False);
 	tester.WaitTillTargetsReached();

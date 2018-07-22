@@ -125,17 +125,13 @@ class HardwareDevices():
 
 	@property
 	def arms(self):
-		if (self._arms == None):
-			self._arms = Arms(self._servoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450);
-		return self._arms;
+		return self._arms
 
 	def __init__(self):
-		
 		servos = LX16AServos();
-		self._servoManager = SmartServoManager(lX16AServos=servos, servoIds= [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],ramp=0, maxSpeed=1);
-		
-		
-		return
+		self._servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
+		self._arms = Arms(self._servoManager)
+		self._servoManager.Start()
 
 	def Release(self):
 		if (self._released == False):
@@ -177,7 +173,7 @@ if __name__ == "__main__":
 	#print ("body_leds: " + str(devices.body_leds))
 	#print ("power_management: " + str(devices.power_management))
 	
-	devices.arms.SetArm(gesture=Arms._strechSide, left=True);
+	#devices.arms.SetArm(gesture=Arms._strechSide, left=True);
 	devices.arms.WaitTillTargetsReached();
 
 	devices.Release()
