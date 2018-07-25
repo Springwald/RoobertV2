@@ -54,22 +54,20 @@ from SmartServoManager import SmartServoManager
 
 import atexit
 
-clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
+
 
 class Arms():
 
 	_servoManager = None;
 	_released = False;
 	
-	_armHanging 	= [[1,151],[2,168],[3,455],[4,613],[5,471]];
-	_wink1 		= [[1,374],[2,451],[3,693],[4,816],[5,565]];
-	_wink2 		= [[1,192],[2,678],[3,888],[4,872],[5,509]];
-	_strechSide	= [[1,299],[2,249],[3,663],[4,660],[5,848]];
-	_lookHand	= [[1,592],[2, 90],[3,361],[4,787],[5,795]];
-	_ghettoFist1	= [[1,105],[2,140],[3,525],[4,910],[5,116]];
-	_ghettoFist2	= [[1,339],[2,138],[3,525],[4,753],[5,116]];
+	_armHanging 	= [[1,185],[3,273],[5,501],[6,541],[7,495],[8,499]]
+	_lookAtHand 	= [[1,226],[3,680],[5,346],[6,802],[7,830],[8,499]]
+	_wink1 			= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
+	_wink2 			= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
 	
-	_leftServoCorrection = [-50,20,0,0,0,50];
+	_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
+
 	
 	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
 		self._servoManager = smartServoManager
@@ -95,6 +93,16 @@ class Arms():
 		self._servoManager.AddMasterServo(servoId=6, centeredValue=460);
 		self._servoManager.AddMasterServo(servoId=7, centeredValue=495);
 		self._servoManager.AddMasterServo(servoId=8, centeredValue=500);
+		
+		# left arm
+		self._servoManager.AddMasterServo(servoId=11, centeredValue=565);
+		self._servoManager.AddSlaveServo(servoId=12, masterServoId=11, reverseToMaster=-1, centeredValue=439);
+		self._servoManager.AddMasterServo(servoId=13, centeredValue=329);
+		self._servoManager.AddSlaveServo(servoId=14, masterServoId=13, reverseToMaster=-1, centeredValue=700);
+		self._servoManager.AddMasterServo(servoId=15, centeredValue=477);
+		self._servoManager.AddMasterServo(servoId=16, centeredValue=486);
+		self._servoManager.AddMasterServo(servoId=17, centeredValue=501);
+		self._servoManager.AddMasterServo(servoId=18, centeredValue=503);
 
 	def PrintRightArmValues(self):
 		self._servoManager.SetReadOnly(servoId=1, isReadOnly=True);
@@ -107,20 +115,21 @@ class Arms():
 		self._servoManager.SetReadOnly(servoId=8, isReadOnly=True);
 		self._servoManager.Start()
 		while(True):
-			out = ""
-			# print all readonly servos
-			for a in range(0, self._servoManager.servoCount):
-				id = self._servoManager._servoIds[a]
-				if (self._servoManager._isReadOnly[a]==True):
-					p = self._servoManager.ReadServo(id)
-					#if (p != -1):
-					out = out  + str(id) + ": " + str(p) + "\r\n"
-					
-			# print only the master servos in in copy format
+			self._servoManager.PrintReadOnlyServoValues()
+			time.sleep(0.1)
 			
-			## push to screen
-			clear()
-			print(out)
+	def PrintLeftArmValues(self):
+		self._servoManager.SetReadOnly(servoId=11, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=12, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=13, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=14, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=15, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=16, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=17, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=18, isReadOnly=True);
+		self._servoManager.Start()
+		while(True):
+			self._servoManager.PrintReadOnlyServoValues(onlyMasterServos=False)
 			time.sleep(0.1)
 
 	def SetArm(self, gesture, left):
@@ -128,8 +137,8 @@ class Arms():
 			id = gesture[p][0]
 			value = gesture[p][1]
 			if (left == True):
-				id = id + 6;
-				value = 1000-value + self._leftServoCorrection[p];
+				id = id + 10;
+				value = -(value - self._servoManager.GetCenteredValue(id-10)) + self._servoManager.GetCenteredValue(id)
 			self._servoManager.MoveServo(id,value);
 			
 	def WaitTillTargetsReached(self):
@@ -171,7 +180,39 @@ if __name__ == "__main__":
 	servos = LX16AServos()
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
-	tester.PrintRightArmValues()
+	#tester.PrintRightArmValues()
+	#tester.PrintLeftArmValues();
+	
+	servoManager.Start();
+	tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
+	tester.WaitTillTargetsReached();
+	
+	#while(True):
+	#	print()
+	
+	while(True):
+		tester.SetArm(gesture=Arms._armHanging, left=False);
+		tester.WaitTillTargetsReached();
+		tester.SetArm(gesture=Arms._lookAtHand, left=False);
+		tester.WaitTillTargetsReached();
+		for i in range(1,4):
+			tester.SetArm(gesture=Arms._wink2, left=False);
+			tester.WaitTillTargetsReached();
+			tester.SetArm(gesture=Arms._wink1, left=False);
+			tester.WaitTillTargetsReached();
+			
+		tester.SetArm(gesture=Arms._armHanging, left=True);
+		tester.WaitTillTargetsReached();
+		tester.SetArm(gesture=Arms._lookAtHand, left=True);
+		tester.WaitTillTargetsReached();
+		for i in range(1,4):
+			tester.SetArm(gesture=Arms._wink2, left=True);
+			tester.WaitTillTargetsReached();
+			tester.SetArm(gesture=Arms._wink1, left=True);
+			tester.WaitTillTargetsReached();
+			
+	
+	
 	
 	plus = 100
 	servoManager.Start()
