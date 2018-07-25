@@ -54,7 +54,7 @@ from SmartServoManager import SmartServoManager
 
 import atexit
 
-clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
+
 
 class Arms():
 
@@ -66,6 +66,8 @@ class Arms():
 	_wink1 			= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
 	_wink2 			= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
 	
+	_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
+
 	
 	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
 		self._servoManager = smartServoManager
@@ -92,6 +94,16 @@ class Arms():
 		self._servoManager.AddMasterServo(servoId=7, centeredValue=495);
 		self._servoManager.AddMasterServo(servoId=8, centeredValue=500);
 		
+		# left arm
+		self._servoManager.AddMasterServo(servoId=11, centeredValue=565);
+		self._servoManager.AddSlaveServo(servoId=12, masterServoId=11, reverseToMaster=-1, centeredValue=439);
+		self._servoManager.AddMasterServo(servoId=13, centeredValue=329);
+		self._servoManager.AddSlaveServo(servoId=14, masterServoId=13, reverseToMaster=-1, centeredValue=700);
+		self._servoManager.AddMasterServo(servoId=15, centeredValue=477);
+		self._servoManager.AddMasterServo(servoId=16, centeredValue=486);
+		self._servoManager.AddMasterServo(servoId=17, centeredValue=501);
+		self._servoManager.AddMasterServo(servoId=18, centeredValue=503);
+
 	def PrintRightArmValues(self):
 		self._servoManager.SetReadOnly(servoId=1, isReadOnly=True);
 		self._servoManager.SetReadOnly(servoId=2, isReadOnly=True);
@@ -102,49 +114,31 @@ class Arms():
 		self._servoManager.SetReadOnly(servoId=7, isReadOnly=True);
 		self._servoManager.SetReadOnly(servoId=8, isReadOnly=True);
 		self._servoManager.Start()
-		
-		import pyperclip
-		
 		while(True):
-			out = ""
-			firstCode= True
-			code = "_gesture 	= ["
-			# print all readonly servos
-			for a in range(0, self._servoManager.servoCount):
-				id = self._servoManager._servoIds[a]
-				if (self._servoManager._isReadOnly[a]==True):
-					p = self._servoManager.ReadServo(id)
-					if (p != -1):
-						out = out  + str(id) + ": " + str(p) + "\r\n"
-						if (self._servoManager._masterIds[a] == id):
-							if (firstCode==True):
-								firstCode = False
-							else:
-								code = code + ","
-							code = code + "[" + str(id) + "," + str(p) +"]"
-
-			# print only the master servos in in copy format
-			code = code + "]"
-			out = out + "\r\n" + code 
-			
-			## push to screen
-			clear()
-			print(out)
-			
-			## copy to clipboard
-			pyperclip.copy(code)
-			#spam = pyperclip.paste()
-
+			self._servoManager.PrintReadOnlyServoValues()
 			time.sleep(0.1)
-
+			
+	def PrintLeftArmValues(self):
+		self._servoManager.SetReadOnly(servoId=11, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=12, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=13, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=14, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=15, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=16, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=17, isReadOnly=True);
+		self._servoManager.SetReadOnly(servoId=18, isReadOnly=True);
+		self._servoManager.Start()
+		while(True):
+			self._servoManager.PrintReadOnlyServoValues(onlyMasterServos=False)
+			time.sleep(0.1)
 
 	def SetArm(self, gesture, left):
 		for p in range(0,len(gesture)):
 			id = gesture[p][0]
 			value = gesture[p][1]
 			if (left == True):
-				id = id + 6;
-				value = 1000-value + self._leftServoCorrection[p];
+				id = id + 10;
+				value = -(value - self._servoManager.GetCenteredValue(id-10)) + self._servoManager.GetCenteredValue(id)
 			self._servoManager.MoveServo(id,value);
 			
 	def WaitTillTargetsReached(self):
@@ -187,8 +181,14 @@ if __name__ == "__main__":
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
 	#tester.PrintRightArmValues()
+	#tester.PrintLeftArmValues();
 	
 	servoManager.Start();
+	tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
+	tester.WaitTillTargetsReached();
+	
+	#while(True):
+	#	print()
 	
 	while(True):
 		tester.SetArm(gesture=Arms._armHanging, left=False);
@@ -199,6 +199,16 @@ if __name__ == "__main__":
 			tester.SetArm(gesture=Arms._wink2, left=False);
 			tester.WaitTillTargetsReached();
 			tester.SetArm(gesture=Arms._wink1, left=False);
+			tester.WaitTillTargetsReached();
+			
+		tester.SetArm(gesture=Arms._armHanging, left=True);
+		tester.WaitTillTargetsReached();
+		tester.SetArm(gesture=Arms._lookAtHand, left=True);
+		tester.WaitTillTargetsReached();
+		for i in range(1,4):
+			tester.SetArm(gesture=Arms._wink2, left=True);
+			tester.WaitTillTargetsReached();
+			tester.SetArm(gesture=Arms._wink1, left=True);
 			tester.WaitTillTargetsReached();
 			
 	
