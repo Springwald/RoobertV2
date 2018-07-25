@@ -69,27 +69,83 @@ module MakerBeamHole() {
 
 
 module Arm01_Shoulder () {    
-    color([0,1,1]) DoubleHolderOuter();
+    
+    length=105;
     
     difference() {
-        translate([-29,12.5,-19]) 
-        {
-            color([1,1,1]) cube([15,25,105], center=true);
-            translate([-4,7,0]) rotate([0,0,45]) color([1,1,1]) cube([25,15,105], center=true);
-            translate([-13.5,15,0]) rotate([0,90,45]) color([1,1,1]) cube([20,25,50], center=true);
+        union() {
+            color([0,1,1]) DoubleHolderOuter(hole=false, frame=false);
+            translate([-29,12.5,-19]) 
+            {
+                color([1,1,1]) cube([15,25,length], center=true);
+                translate([-4,7,0]) rotate([0,0,45]) color([1,1,1]) cube([25,15,105], center=true);
+                translate([-13.5,15,0]) rotate([0,90,45]) color([1,1,1]) cube([20,25,50], center=true);
+                translate([-18,-0,0]) rotate([0,90,45]) color([1,1,1]) cube([20,30,20], center=true);
+            }
         }
-
         union() {
             translate([-46,25,-19]) rotate([0,90,45]) color([1,0,1]) MakerBeam(screwHolesTop=true, screwHolesMiddle=true);
+            translate([0,-98,-20]) cube([200,200,200],center=true);
         }
     }
+    
 }
 
 module Arm02_Top () {
     DoubleHolderInner();
+    color([0,1,1]) {
+        translate([16,-16.1,-20]) cube([5,15,60],center=true);
+        translate([-16,-16.1,-20]) cube([5,15,60],center=true);
+        
+        translate([-33,-22,-12.5]) cube([39,7,15],center=true);
+        translate([27,-22,-12.5]) cube([28,7,15],center=true);
+        translate([-25,-45,-25]) 
+        rotate([90,0,-90]) 
+        DoubleHolderOuter(hole=false);
+    }
 }
 
-module Arm03_Top () {
+module Arm02_TopV2 () {
+    
+    difference() {
+            union() {
+                DoubleHolderInner();
+                color([0,1,1]) {
+                    //translate([15,-16.1,-11.5]) cube([3,15,60],center=true);
+                    translate([-16,-16.1,-11.5]) cube([5,15,60],center=true);
+                    
+                    translate([-46,-22,11.5]) cube([67,7,15],center=true);
+                    translate([-55,-45,-4.7]) rotate([90,0,-90]) DoubleHolderOuter(hole=false, frame=false);
+                }
+        }
+        translate([0,0,118.375]) cube([200,200,200],center=true);
+    }
+    
+}
+
+module Arm03_Top () 
+{
+    translate([-55,-44,-5])
+    {
+        difference() {
+            union() {
+                rotate([90,0,0]) rotate([0,-90,0]) DoubleHolderInner();
+                translate([15,-36,-21.5]) rotate([0,0,-90]) LX16ACircleHolderSteg();
+                translate([-10,-17.5,-15]) cube([60,5,22]);
+                translate([15,-15.5,-45])  difference() {
+                    cube([25,25,22]);
+                    translate([-5,0,-2]) rotate([-45,0,0]) cube([50,50,50]);
+                }
+            }
+            translate([0,0,106.75]) cube([200,200,200],center=true);
+        }
+    }
+}
+
+module Arm03a_Top () {
+    translate([0,-50,0])
+    {
+    
     difference() 
     {
         union() {
@@ -105,6 +161,7 @@ module Arm03_Top () {
                 translate([0,0,-4.8]) LX16AAxisScrewDriverTunnels();
             }
     }
+    }DoubleHolderInner();
 }
 
 module Arm04_Middle () {
@@ -253,10 +310,10 @@ module Arm06_Bottom () {
 
 }
 
-Arm01_Shoulder();
-Arm02_Top ();
+//Arm01_Shoulder();
+//Arm02_TopV2 ();
 
-//Arm03_Top();
+Arm03_Top();
 //Arm04_Middle();
 //Arm05_Middle();
 //Arm06_Bottom();
