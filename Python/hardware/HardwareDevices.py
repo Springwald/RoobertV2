@@ -125,7 +125,7 @@ class HardwareDevices():
 
 	@property
 	def arms(self):
-		return self._arms
+		return self._arms 
 
 	def __init__(self):
 		servos = LX16AServos();
