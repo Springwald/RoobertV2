@@ -61,15 +61,11 @@ class Arms():
 	_servoManager = None;
 	_released = False;
 	
-	_armHanging 	= [[1,151],[2,168],[3,455],[4,613],[5,471]];
-	_wink1 		= [[1,374],[2,451],[3,693],[4,816],[5,565]];
-	_wink2 		= [[1,192],[2,678],[3,888],[4,872],[5,509]];
-	_strechSide	= [[1,299],[2,249],[3,663],[4,660],[5,848]];
-	_lookHand	= [[1,592],[2, 90],[3,361],[4,787],[5,795]];
-	_ghettoFist1	= [[1,105],[2,140],[3,525],[4,910],[5,116]];
-	_ghettoFist2	= [[1,339],[2,138],[3,525],[4,753],[5,116]];
+	_armHanging 	= [[1,185],[3,273],[5,501],[6,541],[7,495],[8,499]]
+	_lookAtHand 	= [[1,226],[3,680],[5,346],[6,802],[7,830],[8,499]]
+	_wink1 			= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
+	_wink2 			= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
 	
-	_leftServoCorrection = [-50,20,0,0,0,50];
 	
 	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
 		self._servoManager = smartServoManager
@@ -95,7 +91,7 @@ class Arms():
 		self._servoManager.AddMasterServo(servoId=6, centeredValue=460);
 		self._servoManager.AddMasterServo(servoId=7, centeredValue=495);
 		self._servoManager.AddMasterServo(servoId=8, centeredValue=500);
-
+		
 	def PrintRightArmValues(self):
 		self._servoManager.SetReadOnly(servoId=1, isReadOnly=True);
 		self._servoManager.SetReadOnly(servoId=2, isReadOnly=True);
@@ -106,22 +102,41 @@ class Arms():
 		self._servoManager.SetReadOnly(servoId=7, isReadOnly=True);
 		self._servoManager.SetReadOnly(servoId=8, isReadOnly=True);
 		self._servoManager.Start()
+		
+		import pyperclip
+		
 		while(True):
 			out = ""
+			firstCode= True
+			code = "_gesture 	= ["
 			# print all readonly servos
 			for a in range(0, self._servoManager.servoCount):
 				id = self._servoManager._servoIds[a]
 				if (self._servoManager._isReadOnly[a]==True):
 					p = self._servoManager.ReadServo(id)
-					#if (p != -1):
-					out = out  + str(id) + ": " + str(p) + "\r\n"
-					
+					if (p != -1):
+						out = out  + str(id) + ": " + str(p) + "\r\n"
+						if (self._servoManager._masterIds[a] == id):
+							if (firstCode==True):
+								firstCode = False
+							else:
+								code = code + ","
+							code = code + "[" + str(id) + "," + str(p) +"]"
+
 			# print only the master servos in in copy format
+			code = code + "]"
+			out = out + "\r\n" + code 
 			
 			## push to screen
 			clear()
 			print(out)
+			
+			## copy to clipboard
+			pyperclip.copy(code)
+			#spam = pyperclip.paste()
+
 			time.sleep(0.1)
+
 
 	def SetArm(self, gesture, left):
 		for p in range(0,len(gesture)):
@@ -171,7 +186,23 @@ if __name__ == "__main__":
 	servos = LX16AServos()
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
-	tester.PrintRightArmValues()
+	#tester.PrintRightArmValues()
+	
+	servoManager.Start();
+	
+	while(True):
+		tester.SetArm(gesture=Arms._armHanging, left=False);
+		tester.WaitTillTargetsReached();
+		tester.SetArm(gesture=Arms._lookAtHand, left=False);
+		tester.WaitTillTargetsReached();
+		for i in range(1,4):
+			tester.SetArm(gesture=Arms._wink2, left=False);
+			tester.WaitTillTargetsReached();
+			tester.SetArm(gesture=Arms._wink1, left=False);
+			tester.WaitTillTargetsReached();
+			
+	
+	
 	
 	plus = 100
 	servoManager.Start()
