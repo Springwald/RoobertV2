@@ -39,27 +39,28 @@ use <..\Parts\ArmPartsStronger.scad>
 
 withSupport = true;
 all=true;
-rightArm = true;
+rightArm = false;
 
 function mirr() = (rightArm==true) ? 0 : 1;
 
 // Arm01_Shoulder
-if (withSupport == false || all) 
-    color([1,1,1]) // White
-       translate([0,0,0]) 
-            mirror([0,mirr(),0])
-                rotate([90,0,0]) Arm01_Shoulder();
+//if (withSupport == false || all) 
+//    color([1,1,1]) // White
+//       translate([0,0,0]) 
+//            mirror([0,mirr(),0])
+//                rotate([90,0,0]) Arm01_Shoulder();
 
-//// Arm02_Top
+// Arm02_Top
 //if (withSupport == true || all) 
 //    color([1,0,0]) // red
-//        translate([0,0,23.75]) rotate([90,0,90]) Arm02_Top();
-//
+//        translate([0,0,23.75]) rotate([90,0,90])  mirror([mirr(),0,0]) Arm02_TopV2();
+
 //// Arm03_Top
-//if (withSupport == true || all) 
-//    color([0,1,0]) // green
-//        translate([30,0,23.75]) rotate([0,180,0]) Arm03_Top();
-//
+if (withSupport == true || all) 
+    color([0,1,0]) // green
+        translate([30,0,23.75]) rotate([0,180,0]) mirror([mirr(),0,0]) Arm03_Top();
+
+
 //// Arm04_Middle
 //if (withSupport == true || all) 
 //    color([0.5,0.5,1]) // blue

@@ -44,56 +44,62 @@ module MakerBeamHole() {
 }
 
 
-module DoubleHolderOuterPart() {
+module DoubleHolderOuterPart(frame=true) {
     margin = 3;
     width = 22;
     width2 = 25;
     widthStabilizer = 2.5;
     marginStabilizer = 2;
-    translate([0, LX16AHeight / 2 - 10, 0]) 
-        
-    difference() 
-    {
-        union() {
-            LX16ACircleHolder(inclusiveBottom=false);
-            // connection circle holder
-            translate([-width/2, 0, LX16AAxisDepth/2 + 3 + margin/2]) cube([width,width2-4,margin], center=true);
-            // connection middle
-            translate([-width + margin/ 2, 0, LX16AStegLengthModification/ 2]) cube([margin,width2,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
-        
-            color([0,1,0]) 
-                translate([-5.75,0, LX16AAxisDepth/2  + 6.5 - LX16AStegLengthModification])
-                    rotate([0,0,180])
-                        BoneStrength(radius=11, length=32.5, startRound=false, scaler=1);
+    innerWidth3 = (frame==true) ? width2 : width2-4;
+    
 
+    translate([0, LX16AHeight / 2 - 10, 0]) 
+        difference() 
+        {
+            union() {
+                LX16ACircleHolder(inclusiveBottom=false);
+                // connection circle holder
+                translate([-width/2, 0, LX16AAxisDepth/2 + 3 + margin/2]) cube([width,width2-4,margin], center=true);
+                // connection middle
+                translate([-width + margin/ 2, 0, LX16AStegLengthModification/ 2]) cube([margin,innerWidth3,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
             
-            // connection middle stabilizer
-             translate([-width + marginStabilizer/ 2 + margin,width2/2 - widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
-            translate([-width + marginStabilizer/ 2 + margin, -width2/2 +widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
+                color([0,1,0]) 
+                    translate([-5.75,0, LX16AAxisDepth/2  + 6.5 - LX16AStegLengthModification])
+                        rotate([0,0,180])
+                            BoneStrength(radius=11, length=32.5, startRound=false, scaler=1);
+
+                
+                // connection middle stabilizer
+                if (frame) {
+                     translate([-width + marginStabilizer/ 2 + margin,width2/2 - widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
+                    translate([-width + marginStabilizer/ 2 + margin, -width2/2 +widthStabilizer/2, LX16AStegLengthModification/ 2]) cube([marginStabilizer,widthStabilizer,LX16AAxisDepth+ 9.5 - LX16AStegLengthModification], center=true);
+                }
+               
+            }
+            color([1,0,1]) LX16AAxis();
+            translate([0,0,14])LX16AAxisScrewDriverTunnels();
+
            
         }
-        color([1,0,1]) LX16AAxis();
-        translate([0,0,14])LX16AAxisScrewDriverTunnels();
-
-       
-    }
 }
 
-module DoubleHolderOuter() {
+module DoubleHolderOuter(hole=true, frame=true) {
     translate([0,0,-1]) {
         difference() {
             union() {
-                DoubleHolderOuterPart();
-                translate([0,0,-36]) mirror([0,0,1]) DoubleHolderOuterPart();
+                DoubleHolderOuterPart(frame);
+                translate([0,0,-36]) mirror([0,0,1]) DoubleHolderOuterPart(frame);
             }
             // Cable hole
-            translate([-20,12.5,-20]) rotate([0,90,0]) cylinder(h=20, r=5.9, $fn=resolutionHi(), center=true); 
+            if (hole==true) { 
+                translate([-20,12.5,-20]) rotate([0,90,0]) cylinder(h=20, r=5.9, $fn=resolutionHi(), center=true); 
+            }
            
         }
     }
 }
 
-module DoubleHolderInner() {
+module DoubleHolderInner(hole=true) {
     holderMargin = 5;
     difference() {
         union() {
@@ -101,11 +107,11 @@ module DoubleHolderInner() {
             translate([0,0,-38]) rotate([0,180,0]) LX16ACubeHolder();
         }
         // Cable hole
-        translate([-10,-0.5,-20]) rotate([0,90,0]) cylinder(h=20, r=5.9, $fn=resolutionHi(), center=true); 
+        if (hole==true) translate([-10,-0.5,-20]) rotate([0,90,0]) cylinder(h=20, r=5.9, $fn=resolutionHi(), center=true); 
     }
 }
 
 
-DoubleHolderOuter();
-DoubleHolderInner();
+ DoubleHolderOuter(frame=true, hole=true);
+//DoubleHolderInner();
 
