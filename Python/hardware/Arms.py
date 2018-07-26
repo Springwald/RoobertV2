@@ -54,7 +54,7 @@ from SmartServoManager import SmartServoManager
 
 import atexit
 
-
+clear = lambda: os.system('cls' if os.name=='nt' else 'clear')
 
 class Arms():
 
@@ -96,6 +96,7 @@ class Arms():
 		
 		# left arm
 		self._servoManager.AddMasterServo(servoId=11, centeredValue=565);
+		#self._servoManager.SetMaxStepsPerUpdate(servoId=11, 
 		self._servoManager.AddSlaveServo(servoId=12, masterServoId=11, reverseToMaster=-1, centeredValue=439);
 		self._servoManager.AddMasterServo(servoId=13, centeredValue=329);
 		self._servoManager.AddSlaveServo(servoId=14, masterServoId=13, reverseToMaster=-1, centeredValue=700);
@@ -105,32 +106,33 @@ class Arms():
 		self._servoManager.AddMasterServo(servoId=18, centeredValue=503);
 
 	def PrintRightArmValues(self):
-		self._servoManager.SetReadOnly(servoId=1, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=2, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=3, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=4, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=5, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=6, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=7, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=8, isReadOnly=True);
+		for id in range(1,8):
+			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
 		self._servoManager.Start()
 		while(True):
 			self._servoManager.PrintReadOnlyServoValues()
 			time.sleep(0.1)
 			
 	def PrintLeftArmValues(self):
-		self._servoManager.SetReadOnly(servoId=11, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=12, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=13, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=14, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=15, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=16, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=17, isReadOnly=True);
-		self._servoManager.SetReadOnly(servoId=18, isReadOnly=True);
+		for id in range(11,18):
+			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
 		self._servoManager.Start()
 		while(True):
 			self._servoManager.PrintReadOnlyServoValues(onlyMasterServos=False)
 			time.sleep(0.1)
+			
+	def MirrorRightArmToLeft(self):
+		for id in range(1,8):
+			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
+		self._servoManager.Start()
+		while(True):
+			for id in [1,3,5,6,7,8]:
+				value = self._servoManager.ReadServo(id=id);
+				#print (str(id) + ":" +str(value))
+				value = -(value - self._servoManager.GetCenteredValue(id)) + self._servoManager.GetCenteredValue(id+10)
+				self._servoManager.MoveServo(id=id+10, pos=value);
+			time.sleep(0.01)
+			#clear()
 
 	def SetArm(self, gesture, left):
 		for p in range(0,len(gesture)):
@@ -175,11 +177,14 @@ def exit_handler():
 
 if __name__ == "__main__":
 
+	atexit.register(exit_handler)
+
 	ended = False;
 	
 	servos = LX16AServos()
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
+	tester.MirrorRightArmToLeft();
 	#tester.PrintRightArmValues()
 	#tester.PrintLeftArmValues();
 	
