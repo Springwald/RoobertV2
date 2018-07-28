@@ -110,8 +110,9 @@ class Roobert:
 				
 		#self._body_leds	= self._hardwareDevices.body_leds
 		
-		self._camera = Camera() 		
-
+		self._camera = Camera() 
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True);
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False);
 		
 	def Release(self):
 		if (self._released == False):
@@ -151,7 +152,7 @@ class Roobert:
 	def Greet(self):
 		print("greetings!");
 		self._speechOutput.Speak("Guten Tag.")
-		self._hardwareDevices.arms.SetArm(gesture=Arms._strechSide, left=True);
+		self._hardwareDevices.arms.SetArm(gesture=Arms._stretchSide, left=True);
 		while (self._speechOutput.IsSpeaking()==True):
 			self.Update()
 			time.sleep(0.1)
