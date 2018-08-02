@@ -65,6 +65,7 @@ class Arms():
 	_lookAtHand 	= [[1,226],[3,680],[5,346],[6,802],[7,830],[8,499]]
 	_wink1 			= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
 	_wink2 			= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
+	_stretchSide	= [[1,335],[3,442],[5,542],[6,593],[7,770]]
 	
 	_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
 
@@ -184,19 +185,20 @@ if __name__ == "__main__":
 	servos = LX16AServos()
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
-	tester.MirrorRightArmToLeft();
-	#tester.PrintRightArmValues()
+	#tester.MirrorRightArmToLeft();
+	tester.PrintRightArmValues()
 	#tester.PrintLeftArmValues();
 	
 	servoManager.Start();
-	tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
-	tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
+	#tester.WaitTillTargetsReached();
 	
 	#while(True):
 	#	print()
 	
 	while(True):
 		tester.SetArm(gesture=Arms._armHanging, left=False);
+		tester.SetArm(gesture=Arms._armHanging, left=True);
 		tester.WaitTillTargetsReached();
 		tester.SetArm(gesture=Arms._lookAtHand, left=False);
 		tester.WaitTillTargetsReached();
@@ -216,9 +218,7 @@ if __name__ == "__main__":
 			tester.SetArm(gesture=Arms._wink1, left=True);
 			tester.WaitTillTargetsReached();
 			
-	
-	
-	
+
 	plus = 100
 	servoManager.Start()
 	while(True):
