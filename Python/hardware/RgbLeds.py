@@ -141,7 +141,8 @@ class RgbLeds(MultiProcessing):
 			time.sleep(wait_ms/1000.0)
 					
 	def loadImage(self):
-		image_filename = my_path + '/../Gfx/Body/hearth2.gif'
+		#image_filename = my_path + '/../Gfx/Body/hearth2.gif'
+		image_filename = my_path + '/../Gfx/Body/test.gif'
 		im = Image.open(image_filename)
 		
 		im.seek(im.tell())
@@ -164,21 +165,31 @@ class RgbLeds(MultiProcessing):
 		x = 0
 		xPlus = 0
 		yPlus = 0
-		for neoPos in range(0,self._height * self._width):
+		for neoPos in range(0, self._height * self._width):
 			width, height = img.size
-			imgX = width / self._width * (x+xPlus) 
-			imgY = height * (y+yPlus) / self._height 
+			imgX = (x + xPlus)  #width / self._width * (x+xPlus) 
+			imgY = y #height * (y+yPlus) / self._height 
 			RGB = img.getpixel((imgX, imgY))
 			R,G,B,A = RGB
-			color = Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
+			color =  Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
+			#color =  Color(G, R, B)
 			self._strip.setPixelColor(neoPos, color) #pixels[0,0])
-			x = x + 1
-			if (x > 7):
-				x = 0;
-				y = y + 1
-				if (y >= self._height):
-					y = 0
-					xPlus = xPlus + 8
+			if (y % 2 ==0):
+				x = x + 1
+				if (x > 7):
+					x = 7;
+					y = y + 1
+					if (y >= self._height):
+						y = 0
+						xPlus = xPlus + 8
+			else:
+				x = x - 1
+				if (x < 0):
+					x = 0
+					y = y + 1
+					if (y >= self._height):
+						y = 0
+						xPlus = xPlus + 8
 			#pos = pos + 3
 		self._strip.show()
 		
