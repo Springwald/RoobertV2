@@ -53,11 +53,11 @@ from MultiProcessing import MultiProcessing
 class RgbLeds(MultiProcessing):
 
 	# LED strip configuration:
-	LED_COUNT      = 64+1+24 # Number of LED pixels.
+	LED_COUNT      = 64*4    # Number of LED pixels.
 	LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
 	LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 	LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
-	LED_BRIGHTNESS = 64    # Set to 0 for darkest and 255 for brightest
+	LED_BRIGHTNESS = 8    # Set to 0 for darkest and 255 for brightest
 	LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 	
 	_strip 			= None
@@ -69,10 +69,14 @@ class RgbLeds(MultiProcessing):
 	
 	_pulse_phase	= 1
 	_pulse_step		= 0
+	
+	_blocksWidth 	= 2
+	_blockHeight	= 2
+	
+	_width			= 8 * _blocksWidth
+	_height			= 8 * _blockHeight
 
 	def __init__(self):
-
-		
 		super().__init__(prio=20)
 		
 		# Create NeoPixel object with appropriate configuration.
@@ -137,10 +141,10 @@ class RgbLeds(MultiProcessing):
 			time.sleep(wait_ms/1000.0)
 					
 	def loadImage(self):
-		image_filename = my_path + '/../Gfx/Body/hearth.gif'
+		image_filename = my_path + '/../Gfx/Body/hearth2.gif'
 		im = Image.open(image_filename)
 		
-		im.seek(im.tell()+1)
+		im.seek(im.tell())
 		
 		p = im.getpalette()
 		last_frame = im.convert('RGBA')
@@ -156,17 +160,26 @@ class RgbLeds(MultiProcessing):
 		return new_frame
 			
 	def showImage(self, img): 
-		number =0
-		pos =0
-		for y in range(8):
-			for x in range(8):
-				#color = Color (200,0,0)
-				RGB = img.getpixel((x,y))
-				R,G,B,A = RGB
-				color = Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
-				self._strip.setPixelColor(number, color) #pixels[0,0])
-				number = number + 1
-				#pos = pos + 3
+		y = 0
+		x = 0
+		xPlus = 0
+		yPlus = 0
+		for neoPos in range(0,self._height * self._width):
+			width, height = img.size
+			imgX = width / self._width * (x+xPlus) 
+			imgY = height * (y+yPlus) / self._height 
+			RGB = img.getpixel((imgX, imgY))
+			R,G,B,A = RGB
+			color = Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
+			self._strip.setPixelColor(neoPos, color) #pixels[0,0])
+			x = x + 1
+			if (x > 7):
+				x = 0;
+				y = y + 1
+				if (y >= self._height):
+					y = 0
+					xPlus = xPlus + 8
+			#pos = pos + 3
 		self._strip.show()
 		
 		
@@ -182,8 +195,6 @@ class RgbLeds(MultiProcessing):
 		
 		if (super().updating_ended == True):
 			return
-			
-			
 		steps = 15
 		delay = 0.1
 		
