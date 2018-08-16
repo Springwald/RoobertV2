@@ -61,13 +61,14 @@ class Arms():
 	_servoManager = None;
 	_released = False;
 	
-	_armHanging 	= [[1,185],[3,273],[5,501],[6,541],[7,495],[8,499]]
-	_lookAtHand 	= [[1,226],[3,680],[5,346],[6,802],[7,830],[8,499]]
-	_wink1 			= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
-	_wink2 			= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
-	_stretchSide	= [[1,335],[3,442],[5,542],[6,593],[7,770]]
+	_armHanging 			= [[1,185],[3,273],[5,501],[6,541],[7,495],[8,499]]
 	
-	_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
+	_lookAtHand 			= [[1,226],[3,680],[5,346],[6,802],[7,830],[8,499]]
+	_wink1 					= [[1,476],[3,770],[5,396],[6,866],[7,542],[8,499]]
+	_wink2 					= [[1,459],[3,639],[5,396],[6,739],[7,601],[8,499]]
+	_stretchSide			= [[1,335],[3,442],[5,542],[6,593],[7,770],[8,499]]
+	
+	#_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
 
 	
 	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
@@ -142,8 +143,11 @@ class Arms():
 			if (left == True):
 				id = id + 10;
 				value = -(value - self._servoManager.GetCenteredValue(id-10)) + self._servoManager.GetCenteredValue(id)
-			self._servoManager.MoveServo(id,value);
-			
+				self._servoManager.MoveServo(id,value);
+				#print (id);
+			else:
+				self._servoManager.MoveServo(id,value);
+				#print (id)
 	def WaitTillTargetsReached(self):
 		while (self._servoManager.allTargetsReached == False):
 			time.sleep(0.1);
@@ -186,12 +190,17 @@ if __name__ == "__main__":
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
 	#tester.MirrorRightArmToLeft();
-	tester.PrintRightArmValues()
-	#tester.PrintLeftArmValues();
+	#tester.PrintRightArmValues()
+	
 	
 	servoManager.Start();
+	#time.sleep(1);
 	#tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
 	#tester.WaitTillTargetsReached();
+	
+	#tester.PrintLeftArmValues();
+	
+	
 	
 	#while(True):
 	#	print()
@@ -202,6 +211,7 @@ if __name__ == "__main__":
 		tester.WaitTillTargetsReached();
 		tester.SetArm(gesture=Arms._lookAtHand, left=False);
 		tester.WaitTillTargetsReached();
+		
 		for i in range(1,4):
 			tester.SetArm(gesture=Arms._wink2, left=False);
 			tester.WaitTillTargetsReached();
@@ -219,55 +229,55 @@ if __name__ == "__main__":
 			tester.WaitTillTargetsReached();
 			
 
-	plus = 100
-	servoManager.Start()
-	while(True):
-		plus = - plus
-		#tester._servoManager.MoveServo(1,400+plus)
-		tester._servoManager.MoveServo(3,600+plus)
-		while (tester._servoManager.allTargetsReached == False):
-			time.sleep(0.1)
-	
-	
-	
-	tester.SetHand(opened=False, left= True);
-	tester.SetHand(opened=False, left= False);
-	tester.WaitTillTargetsReached();
-	time.sleep(1);
-	tester.SetHand(opened=True, left= True);
-	tester.SetHand(opened=True, left= False);
-	tester.WaitTillTargetsReached();
-	time.sleep(1);
-	
+	#plus = 100
+	#servoManager.Start()
 	#while(True):
-	#	time.sleep(1)
-	#	print("sleep")
+		#plus = - plus
+		##tester._servoManager.MoveServo(1,400+plus)
+		#tester._servoManager.MoveServo(3,600+plus)
+		#while (tester._servoManager.allTargetsReached == False):
+			#time.sleep(0.1)
+	
+	
+	
+	#tester.SetHand(opened=False, left= True);
+	#tester.SetHand(opened=False, left= False);
+	#tester.WaitTillTargetsReached();
+	#time.sleep(1);
+	#tester.SetHand(opened=True, left= True);
+	#tester.SetHand(opened=True, left= False);
+	#tester.WaitTillTargetsReached();
+	#time.sleep(1);
+	
+	##while(True):
+	##	time.sleep(1)
+	##	print("sleep")
 
 	
-	tester.SetArm(gesture=Arms._strechSide, left=True);
-	tester.WaitTillTargetsReached();
-	
-	#tester.SetArm(gesture=Arms._lookHand, left=False);
+	#tester.SetArm(gesture=Arms._strechSide, left=True);
 	#tester.WaitTillTargetsReached();
 	
-	tester.SetArm(gesture=Arms._strechSide, left=True);
-	tester.SetArm(gesture=Arms._strechSide, left=False);
-	tester.WaitTillTargetsReached();
+	##tester.SetArm(gesture=Arms._lookHand, left=False);
+	##tester.WaitTillTargetsReached();
 	
-	tester.SetArm(gesture=Arms._wink1, left=True);
-	tester.WaitTillTargetsReached();
-	tester.SetArm(gesture=Arms._wink2, left= True);
-	tester.WaitTillTargetsReached();
-	tester.SetArm(gesture=Arms._wink1, left=True);
-	tester.WaitTillTargetsReached();
-	tester.SetArm(gesture=Arms._wink2, left= True);
-	tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._strechSide, left=True);
+	#tester.SetArm(gesture=Arms._strechSide, left=False);
+	#tester.WaitTillTargetsReached();
 	
-	tester.SetHand(opened=False, left= True);
-	tester.SetArm(gesture=Arms._ghettoFist1, left= True);
-	tester.WaitTillTargetsReached();
-	tester.SetArm(gesture=Arms._ghettoFist2, left= True);
-	tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._wink1, left=True);
+	#tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._wink2, left= True);
+	#tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._wink1, left=True);
+	#tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._wink2, left= True);
+	#tester.WaitTillTargetsReached();
+	
+	#tester.SetHand(opened=False, left= True);
+	#tester.SetArm(gesture=Arms._ghettoFist1, left= True);
+	#tester.WaitTillTargetsReached();
+	#tester.SetArm(gesture=Arms._ghettoFist2, left= True);
+	#tester.WaitTillTargetsReached();
 	
 	
 	
