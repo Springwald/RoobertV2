@@ -57,7 +57,7 @@ class RgbLeds(MultiProcessing):
 	LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
 	LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 	LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
-	LED_BRIGHTNESS = 8    # Set to 0 for darkest and 255 for brightest
+	LED_BRIGHTNESS = 64    # Set to 0 for darkest and 255 for brightest
 	LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 	
 	_strip 			= None
@@ -141,8 +141,8 @@ class RgbLeds(MultiProcessing):
 			time.sleep(wait_ms/1000.0)
 					
 	def loadImage(self):
-		#image_filename = my_path + '/../Gfx/Body/hearth2.gif'
-		image_filename = my_path + '/../Gfx/Body/test.gif'
+		image_filename = my_path + '/../Gfx/Body/hearth2.gif'
+		#image_filename = my_path + '/../Gfx/Body/test.gif'
 		im = Image.open(image_filename)
 		
 		im.seek(im.tell())
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 	
 
 
-	for a in range(50):
+	for a in range(5):
 		time.sleep(1)
 	
 	#while ended == False:
