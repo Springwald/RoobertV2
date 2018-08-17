@@ -88,6 +88,9 @@ class HardwareDevices():
 		self._arms = Arms(self._servoManager)
 		self._neck = Neck(self._servoManager)
 		self._servoManager.Start()
+		self._neck.SetLeftRight(0)
+		self._neck.SetUpDown(0)
+		
 		self._bodyLeds = RgbLeds()
 
 	def Release(self):

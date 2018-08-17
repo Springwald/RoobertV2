@@ -74,8 +74,6 @@ class Neck():
 		self._servoManager.AddMasterServo(servoId=self._upDownId, centeredValue=501);
 		self._servoManager.AddSlaveServo(servoId=self._upDownId+1, masterServoId=self._upDownId, reverseToMaster=-1, centeredValue=481);
 		self._servoManager.AddMasterServo(servoId=self._leftRightId, centeredValue=500);
-		self._servoManager.MoveServo(self._upDownId, 0)
-		self._servoManager.MoveServo(self._leftRightId, 0);
 
 	def PrintValues(self):
 		for id in range(23,24):

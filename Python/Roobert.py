@@ -105,7 +105,7 @@ class Roobert:
 		#self._neckLeftRight = NeckLeftRight(self.MotorLeftRightAdress, endStop)
 		#self._neckLeftRight.targetPos = int(self._neckLeftRight.MaxSteps *0.49)
 
-		self._speechOutput = SpeechOutput(soundcard="plughw:1", voice="-vmb-de2"); 
+		self._speechOutput = SpeechOutput(soundcard="plughw:1", voice="-vmb-de6"); 
 				
 		self._faceGfx = FaceGfx(self.showFace)
 				
