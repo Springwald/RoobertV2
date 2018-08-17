@@ -79,6 +79,8 @@ class RgbLeds(MultiProcessing):
 	def __init__(self):
 		super().__init__(prio=20)
 		
+		print ("init RgbLeds")
+		
 		# Create NeoPixel object with appropriate configuration.
 		self._strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS)
 		# Intialize the library (must be called once before other functions).

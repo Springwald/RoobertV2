@@ -54,33 +54,17 @@ from SharedFloats import SharedFloats
 from LX16AServos import LX16AServos
 from SmartServoManager import SmartServoManager
 from Arms import Arms
-
-#from I2cIoExpanderPcf8574 import I2cIoExpanderPcf8574
-#from RelaisI2C import RelaisI2C
-#from Roomba import Roomba
-#from PowerManagement import PowerManagement
-#from RgbLeds import RgbLeds
-#from HandAndArm import HandAndArm
+from Neck import Neck
+from RgbLeds import RgbLeds
 
 import atexit
 
 class HardwareDevices():
 
-	#_roomba								= None
-	#_body_leds							= None
-	#_power_management					= None
-	
-	_arms								 = None
-	
-	#_handArmRight						= None
-	#_handArmLeft						= None
-	
-	#_relais 							= None
-	
-	#power_relais_adress					= 0x39
-	#power_relais_bit_arms_right 		= 5
-	#power_relais_bit_arms_left 			= 7
-	#power_relais_bit_sens3d_servos 		= 6
+	_bodyLeds							= None
+
+	_arms								= None
+	_neck								= None
 	
 	_servoManager						= None
 	_servos								= None
@@ -94,54 +78,25 @@ class HardwareDevices():
 			HardwareDevices.__singleton = HardwareDevices()
 		return HardwareDevices.__singleton
 
-	#@property
-	#def roomba(self):
-	#	if (self._roomba == None):
-	#		self._roomba = Roomba()
-	#	return self._roomba
-
-	#@property
-	#def body_leds(self):
-	#	if (self._body_leds == None):
-	#		self._body_leds = RgbLeds(self.power_management)
-	#	return self._body_leds
-
-	#@property
-	#def relais(self):
-	#	if (self._relais == None):
-	#		self._relais = RelaisI2C(I2cIoExpanderPcf8574(address=self.power_relais_adress, useAsInputs=False))
-	#	return self._relais
-
-	#@property
-	#def power_management(self):
-	#	if (self._power_management == None):
-	#		self._power_management = PowerManagement(self.roomba)
-	#	return self._power_management
-
-	#@property
-	#def hand_arm_right(self):
-	#	if (self._handArmRight == None):
-	#		self._handArmRight = HandAndArm(rightArm = True, i2cAdress=0x40, busnum=1, power_relais = self.relais, relais_bit=self.power_relais_bit_arms_right)
-	#	return self._handArmRight
-
 	@property
 	def arms(self):
 		return self._arms 
 
 	def __init__(self):
 		self._servos = LX16AServos();
-		self._servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
+		self._servoManager = SmartServoManager(lX16AServos=self._servos, ramp=0, maxSpeed=1)
 		self._arms = Arms(self._servoManager)
 		self._neck = Neck(self._servoManager)
 		self._servoManager.Start()
+		self._bodyLeds = RgbLeds()
 
 	def Release(self):
 		if (self._released == False):
 			self._released = True
 			print("releasing hardware devices")
 
-			#if (self._body_leds != None):
-			#	self._body_leds.Release()
+			if (self._bodyLeds != None):
+				self._bodyLeds.Release()
 				
 			if (self._arms != None):
 				self._arms.Release()
@@ -169,12 +124,9 @@ if __name__ == "__main__":
 	
 	atexit.register(exit_handler)
 
-	#print ("roomba: " + str(devices.roomba))
-	#print ("body_leds: " + str(devices.body_leds))
-	#print ("power_management: " + str(devices.power_management))
-	
-	#devices.arms.SetArm(gesture=Arms._strechSide, left=True);
 	devices.arms.WaitTillTargetsReached();
+	
+	time.sleep(5)
 
 	devices.Release()
 
