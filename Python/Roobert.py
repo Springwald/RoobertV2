@@ -60,6 +60,7 @@ from Camera import Camera
 
 from hardware.HardwareDevices import HardwareDevices
 from hardware.Arms import Arms
+from hardware.Neck import Neck
 from _thread import start_new_thread
 
 import atexit

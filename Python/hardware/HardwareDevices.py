@@ -83,6 +83,7 @@ class HardwareDevices():
 	#power_relais_bit_sens3d_servos 		= 6
 	
 	_servoManager						= None
+	_servos								= None
 	
 	__singleton							= None
 	_released 							= False
@@ -128,9 +129,10 @@ class HardwareDevices():
 		return self._arms 
 
 	def __init__(self):
-		servos = LX16AServos();
+		self._servos = LX16AServos();
 		self._servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 		self._arms = Arms(self._servoManager)
+		self._neck = Neck(self._servoManager)
 		self._servoManager.Start()
 
 	def Release(self):
@@ -144,17 +146,15 @@ class HardwareDevices():
 			if (self._arms != None):
 				self._arms.Release()
 				
-			#if (self._handArmLeft != None):
-			#	self._handArmLeft.Release()
+			if (self._neck != None):
+				self._neck.Release()
 				
-			#if (self._power_management != None):
-			#	self._power_management.Release()
+			if (self._servoManager != None):
+				self._servoManager.Release()
 				
-			#if (self._roomba != None):
-			#	self._roomba.Release()
-
-			#if (self._relais != None):
-			#	self._relais.Release()
+			if (self._servos != None):
+				self._servos.Release()
+				
 
 	def __del__(self):
 		self.Release()

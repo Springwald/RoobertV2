@@ -172,13 +172,15 @@ class Arms():
 			self.SetHand(opened=True, left=False);
 			self.SetHand(opened=True, left=True);
 			self.WaitTillTargetsReached();
-			self._servoManager.Release();
 
 	def __del__(self):
 		self.Release()
 
 def exit_handler():
 	tester.Release()
+	servoManager.Release()
+	servos.Release()
+	
 
 if __name__ == "__main__":
 
@@ -282,6 +284,5 @@ if __name__ == "__main__":
 	
 	
 	
-	tester.Release();
 	
 	print("done");
