@@ -81,6 +81,10 @@ class HardwareDevices():
 	@property
 	def arms(self):
 		return self._arms 
+		
+	@property
+	def neck(self):
+		return self._neck 
 
 	def __init__(self):
 		self._servos = LX16AServos();

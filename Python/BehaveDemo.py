@@ -92,8 +92,13 @@ class BehaveDemo:
 			
 	def demo(self):
 		ended = False;
+		
+		#self.Greet()
+		
 		while ended == False:
-			self.Update();
+			
+			self.Update()
+			
 			events = pygame.event.get()
 			for event in events:
 				if event.type == pygame.MOUSEBUTTONUP:
@@ -107,10 +112,13 @@ class BehaveDemo:
 						a=0
 
 	def Update(self):
+		self.UpdateFace()
+		self.FollowFace()
+
+	def UpdateFace(self):
 		if (self.showFace == True):
 			self._faceGfx.speaking = self._speechOutput.IsSpeaking();
-		self.FollowFace();
-			
+
 	def RandomHeadMovement(self):
 		if (self._neckLeftRight.targetReached==True):
 			movementArea = int(self._neckLeftRight.MaxSteps / 2)
@@ -121,14 +129,12 @@ class BehaveDemo:
 			
 	def Greet(self):
 		print("greetings!");
-		self._speechOutput.Speak("Guten Tag.")
 		self._hardwareDevices.arms.SetArm(gesture=Arms._stretchSide, left=True);
+		self._speechOutput.Speak("Guten Tag.")
 		while (self._speechOutput.IsSpeaking()==True):
-			self.Update()
 			time.sleep(0.1)
 		self._speechOutput.Speak("Mein Name ist Robert", wait=False)
 		while (self._speechOutput.IsSpeaking()==True):
-			self.Update()
 			time.sleep(0.1)
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True);
 		self._hardwareDevices.arms.WaitTillTargetsReached();
@@ -137,9 +143,8 @@ class BehaveDemo:
 		self._speechOutput.Speak("Ich freue mich, Sie kennen zu lernen")
 		#self._hardwareDevices.hand_arm_right.gesturePointForward()
 		while (self._speechOutput.IsSpeaking()==True):
-			self.Update()
 			time.sleep(0.1)
-		#self._hardwareDevices.hand_arm_right.home()
+
 
 	def FollowFace(self):
 		faceX = self._camera.posXFace
@@ -157,10 +162,13 @@ class BehaveDemo:
 			self._camera.ResetFace()
 			diffX = (faceX - 0.5) 
 			diffY = (faceY - 0.5) 
-			#if (math.fabs(diffX ) > 0.1):
-			#	self._neckLeftRight.targetPos = self._neckLeftRight.targetPos - int(diffX * 100)
-			#if (math.fabs(diffY ) > 0.1):
-			#	self._neckUpDown.targetPos = self._neckUpDown.targetPos - int(diffY * 100)
+			if (math.fabs(diffX) > 0.1):
+				self._hardwareDevices.neck.SetLeftRight(self._hardwareDevices.neck.GetLeftRight() - int(diffX * 400))
+			if (math.fabs(diffY) > 0.1):
+				newY = self._hardwareDevices.neck.GetUpDown() - int(diffY * 300)
+				print (newY)
+				self._hardwareDevices.neck.SetUpDown(newY)
+				
 			
 			self._faceGfx.SetEyePos(faceX,faceY)
 		else:

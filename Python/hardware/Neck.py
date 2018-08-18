@@ -85,13 +85,27 @@ class Neck():
 				
 	def WaitTillTargetsReached(self):
 		while (self._servoManager.allTargetsReached == False):
-			time.sleep(0.1);
+			time.sleep(0.1)
 
 	def SetUpDown(self, value):
-		self._servoManager.MoveServo(self._upDownId, value+500);
+		if (value > 300):
+			value = 300
+		if (value < -300):
+			value = -300
+		self._servoManager.MoveServo(self._upDownId, value+500)
 		
 	def SetLeftRight(self, value):
-		self._servoManager.MoveServo(self._leftRightId, value+500);
+		if (value > 400):
+			value = 400
+		if (value < -400):
+			value = -400
+		self._servoManager.MoveServo(self._leftRightId, value+500)
+		
+	def GetUpDown(self):
+		return self._servoManager.ReadServo(self._upDownId) - 500
+		
+	def GetLeftRight(self,):
+		return self._servoManager.ReadServo(self._leftRightId) -500
 
 	def Release(self):
 		if (self._released == False):

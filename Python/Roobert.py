@@ -64,18 +64,8 @@ import atexit
 
 class Roobert:
 
-	#I2cIoExpanderPcf8574Adress		= 0x38
-	#MotorLeftRightAdress			= 0x0f
-	#MotorUpDownAdress				= 0x3e
-	#sens_3d_servo_adress			= 0x46
-	
 	_hardwareDevices 				= None
-	
-	#FirstI2cIoExpanderPcf8574		= None
-	#_roomba							= None
 	_faceGfx						= None
-	_neckLeftRight					= None
-	_neckUpDown						= None
 	_speechOutput					= None
 	_camera							= None
 	
