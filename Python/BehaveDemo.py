@@ -94,6 +94,7 @@ class BehaveDemo:
 		ended = False;
 		
 		#self.Greet()
+		#self.FirstInfoAboutRoobert()
 		
 		while ended == False:
 			
@@ -128,23 +129,70 @@ class BehaveDemo:
 			self._neckUpDown.targetPos =randrange(0, movementArea)
 			
 	def Greet(self):
-		print("greetings!");
-		self._hardwareDevices.arms.SetArm(gesture=Arms._stretchSide, left=True);
-		self._speechOutput.Speak("Guten Tag.")
-		while (self._speechOutput.IsSpeaking()==True):
-			time.sleep(0.1)
+		
+		touchBody 		= [[1,212],[3,511],[5,138],[6,890],[7,702]]
+		holdInFront 	= [[1,186],[3,398],[5,260],[6,718],[7,603]]
+		pointToUser 	= [[1,213],[3,408],[5,641],[6,717],[7,755]]
+		
+		self.ResetArms()
+
+		self._speechOutput.Speak("Guten Tag.", wait=True)
+			
+		self._hardwareDevices.arms.SetArm(gesture=touchBody, left=True);
 		self._speechOutput.Speak("Mein Name ist Robert", wait=False)
 		while (self._speechOutput.IsSpeaking()==True):
 			time.sleep(0.1)
-		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True);
-		self._hardwareDevices.arms.WaitTillTargetsReached();
-		while (self._speechOutput.IsSpeaking()==True):
-			time.sleep(1)
-		self._speechOutput.Speak("Ich freue mich, Sie kennen zu lernen")
-		#self._hardwareDevices.hand_arm_right.gesturePointForward()
+		
+		self._hardwareDevices.arms.SetArm(gesture=holdInFront, left=True);	
+		self._speechOutput.Speak("Ich freue mich, Sie kennen zu lernen", wait=False)
+		time.sleep(1)
+		self._hardwareDevices.arms.SetArm(gesture=pointToUser, left=True);
+		self._hardwareDevices.arms.SetArm(gesture=pointToUser, left=False);
+
 		while (self._speechOutput.IsSpeaking()==True):
 			time.sleep(0.1)
+			
+		while (self._hardwareDevices.arms.WaitTillTargetsReached()==False):
+			time.sleep(0.1)
+			
+		self.ResetArms()
+		
+		self.FirstInfoAboutRoobert()
+		
+	def ResetArms(self):
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
+		while (self._hardwareDevices.arms.WaitTillTargetsReached()==False):
+			time.sleep(0.1)
 
+	def FirstInfoAboutRoobert(self):
+		
+		pointToSide			= [[1,207],[3,297],[5,533],[6,741],[7,797]]
+		pointToHead 		= [[1,204],[3,698],[5,395],[6,872],[7,781]]
+		pointToBodyDisplay	= [[1,226],[3,374],[5,144],[6,842],[7,547]]
+		pointToOtherArm1 	= [[1,126],[3,525],[5,237],[6,804],[7,546]]
+		pointToOtherArm2 	= [[1,131],[3,481],[5,488],[6,896],[7,503]]
+		
+		self.ResetArms()
+		
+		self._hardwareDevices.arms.SetArm(gesture=pointToSide, left=False)
+		self._speechOutput.Speak("Ich kann ihnen gerne Details über mich erzählen.")
+		
+		self._hardwareDevices.arms.SetArm(gesture=pointToHead, left=True)
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
+		self._speechOutput.Speak("Mein Gesicht ist ein Bildschirm und wird von einem Raspberry Pei gesteuert")
+		
+		self._hardwareDevices.arms.SetArm(gesture=pointToBodyDisplay, left=False);
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
+		self._speechOutput.Speak("In meinem Körper steckt eine weitere Anzeige mit 16 mal 16 Pixeln Auflösung")
+		
+		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm1, left=False);
+		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm2, left=True);
+		self._speechOutput.Speak("Jeder meiner Arme wird von 8 Servo Motoren angetrieben.")
+
+
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
+		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
 
 	def FollowFace(self):
 		faceX = self._camera.posXFace

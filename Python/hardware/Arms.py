@@ -192,7 +192,9 @@ if __name__ == "__main__":
 	servoManager = SmartServoManager(lX16AServos=servos, ramp=0, maxSpeed=1)
 	tester = Arms(servoManager)
 	#tester.MirrorRightArmToLeft();
-	#tester.PrintRightArmValues()
+	
+	tester.PrintRightArmValues()
+	#tester.PrintLeftArmValues();
 	
 	
 	servoManager.Start();
@@ -200,7 +202,7 @@ if __name__ == "__main__":
 	#tester.SetArm(gesture=Arms._rightCenteredValues, left=True);
 	#tester.WaitTillTargetsReached();
 	
-	#tester.PrintLeftArmValues();
+	
 	
 	
 	
