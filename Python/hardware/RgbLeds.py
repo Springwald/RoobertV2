@@ -57,7 +57,7 @@ class RgbLeds(MultiProcessing):
 	LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
 	LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 	LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
-	LED_BRIGHTNESS = 64    # Set to 0 for darkest and 255 for brightest
+	LED_BRIGHTNESS = 127    # Set to 0 for darkest and 255 for brightest
 	LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 	
 	_strip 			= None
@@ -208,14 +208,14 @@ class RgbLeds(MultiProcessing):
 		
 		if (super().updating_ended == True):
 			return
-		steps = 15
-		delay = 0.1
+		steps = 20
+		delay = 0.05
 		
 		self._pulse_step = self._pulse_step + self._pulse_phase
 		if (self._pulse_step > steps or self._pulse_step < 1):
 			self._pulse_phase = - self._pulse_phase
 
-		self._dimmer = 0.5/ steps * self._pulse_step
+		self._dimmer = 0.5 * self._pulse_step / steps 
 		self.showImage(self._hearthPic)
 		time.sleep(delay)
 
