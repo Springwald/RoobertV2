@@ -74,6 +74,8 @@ class BehaveDemo:
 	_lastFace						= time.time() - 1000
 	
 	_rotate							= 1
+	
+	_actionRunning					= False
 
 	def __init__(self, hardwareDevices, speechOutput, faceGfx, camera):
 
@@ -104,11 +106,18 @@ class BehaveDemo:
 			for event in events:
 				if event.type == pygame.MOUSEBUTTONUP:
 					ended = True 
+					
 				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_ESCAPE:
+					if event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
 						ended = True 
+						
+					if event.key == pygame.K_KP0:
+						self.Greet()
+					
+					if event.key == pygame.K_KP1:
+						self.FirstInfoAboutRoobert()
+
 					if event.key == pygame.K_TAB:
-						#roobert.Greet()
 						#start_new_thread(roobert.Greet,())
 						a=0
 
@@ -129,6 +138,8 @@ class BehaveDemo:
 			self._neckUpDown.targetPos =randrange(0, movementArea)
 			
 	def Greet(self):
+		
+		self._actionRunning = True
 		
 		touchBody 		= [[1,212],[3,511],[5,138],[6,890],[7,702]]
 		holdInFront 	= [[1,186],[3,398],[5,260],[6,718],[7,603]]
@@ -156,8 +167,8 @@ class BehaveDemo:
 			time.sleep(0.1)
 			
 		self.ResetArms()
-		
-		self.FirstInfoAboutRoobert()
+
+		self._actionRunning = False
 		
 	def ResetArms(self):
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
@@ -166,6 +177,8 @@ class BehaveDemo:
 			time.sleep(0.1)
 
 	def FirstInfoAboutRoobert(self):
+		
+		self._actionRunning = True
 		
 		pointToSide			= [[1,207],[3,297],[5,533],[6,741],[7,797]]
 		pointToHead 		= [[1,204],[3,698],[5,395],[6,872],[7,781]]
@@ -190,11 +203,16 @@ class BehaveDemo:
 		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm2, left=True);
 		self._speechOutput.Speak("Jeder meiner Arme wird von 8 Servo Motoren angetrieben.")
 
-
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
+		
+		self._actionRunning = False
 
 	def FollowFace(self):
+		
+		if (self._actionRunning == True):
+			return
+		
 		faceX = self._camera.posXFace
 		faceY = self._camera.posYFace
 		timeSinceLastFace = time.time() - self._lastFace 
@@ -202,7 +220,7 @@ class BehaveDemo:
 			# oh, there is a face
 			if (timeSinceLastFace > 60):
 				# see a face after a long time: say hello!
-				start_new_thread(self.Greet,())
+				# start_new_thread(self.Greet,())
 				#self.Greet()
 				a=0
 				
@@ -217,7 +235,6 @@ class BehaveDemo:
 				print (newY)
 				self._hardwareDevices.neck.SetUpDown(newY)
 				
-			
 			self._faceGfx.SetEyePos(faceX,faceY)
 		else:
 			# there is no face
