@@ -47,8 +47,10 @@ my_path ='/'.join(my_file.split('/')[0:-1])
 
 sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/multitasking")
 sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/hardware")
+sys.path.insert(0,my_path + "/../DanielsRasPiPythonLibs/gfx")
 
 from MultiProcessing import MultiProcessing
+from AnimationImage import AnimationImage
 
 class RgbLeds(MultiProcessing):
 
@@ -65,7 +67,7 @@ class RgbLeds(MultiProcessing):
 	_released		= False
 	_dimmer			 = 1
 	
-	_hearthPic		= None
+	Images			= []
 	
 	_pulse_phase	= 1
 	_pulse_step		= 0
@@ -73,10 +75,30 @@ class RgbLeds(MultiProcessing):
 	_blocksWidth 	= 2
 	_blockHeight	= 2
 	
+	
 	_width			= 8 * _blocksWidth
 	_height			= 8 * _blockHeight
+	
+	_aniFrameNo		= 0
+	
+	__activeImageNo		= MultiProcessing.get_next_key() 
+	__activeImageMode	= MultiProcessing.get_next_key() 
+	
+	@property
+	def activeImageNo(self):
+		return self.GetSharedValue(self.__activeImageNo)
+	@activeImageNo.setter
+	def activeImageNo(self, value):
+		self.SetSharedValue(self.__activeImageNo, value)
+		
+	@property
+	def activeImageMode(self):
+		return self.GetSharedValue(self.__activeImageMode)
+	@activeImageMode.setter
+	def activeImageMode(self, value):
+		self.SetSharedValue(self.__activeImageMode, value)
 
-	def __init__(self):
+	def __init__(self, imageFilenames):
 		super().__init__(prio=20)
 		
 		print ("init RgbLeds")
@@ -86,8 +108,12 @@ class RgbLeds(MultiProcessing):
 		# Intialize the library (must be called once before other functions).
 		self._strip.begin()
 		
-		self._hearthPic = self.loadImage()
-		
+		for i in range(len(imageFilenames)):
+			self.Images.append(AnimationImage(imageFilenames[i]));
+
+		self.activeImageNo = 0
+		self.activeImageMode = 0
+
 		super().StartUpdating()
 		
 	def colorWipe(self, color, wait_ms=0.1):
@@ -141,39 +167,21 @@ class RgbLeds(MultiProcessing):
 				strip.setPixelColor(i, self.wheel(((int(i * 256 / strip.numPixels()) + j) & 255)))
 			strip.show()
 			time.sleep(wait_ms/1000.0)
-					
-	def loadImage(self):
-		image_filename = my_path + '/../Gfx/Body/hearth2.gif'
-		#image_filename = my_path + '/../Gfx/Body/test.gif'
-		im = Image.open(image_filename)
-		
-		im.seek(im.tell())
-		
-		p = im.getpalette()
-		last_frame = im.convert('RGBA')
-		
-		if not im.getpalette():
-			im.putpalette(p)
-		
-		new_frame = Image.new('RGBA', im.size)
-		new_frame.paste(im,(0,0), im.convert('RGBA'))
-		
-		#ixels = im.load()
-		
-		return new_frame
-			
-	def showImage(self, img): 
+
+	def showImage(self, imgframes, frame=0): 
 		y = 0
 		x = 0
 		xPlus = 0
 		yPlus = 0
+		img = imgframes[frame]
 		for neoPos in range(0, self._height * self._width):
 			width, height = img.size
-			imgX = (x + xPlus)  #width / self._width * (x+xPlus) 
-			imgY = y #height * (y+yPlus) / self._height 
+			imgX = width / self._width * (x+xPlus)  #(x + xPlus)  #
+			imgY = height * (y+yPlus) / self._height  #y 
 			RGB = img.getpixel((imgX, imgY))
 			R,G,B,A = RGB
-			color =  Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
+			#color =  Color(int(B * self._dimmer), int(R * self._dimmer),int(G * self._dimmer))
+			color =  Color(int(G * self._dimmer), int(R * self._dimmer),int(B * self._dimmer))
 			#color =  Color(G, R, B)
 			self._strip.setPixelColor(neoPos, color) #pixels[0,0])
 			if (y % 2 ==0):
@@ -205,7 +213,25 @@ class RgbLeds(MultiProcessing):
 				number = number + 1
 							
 	def Update(self):
+		if self.activeImageMode == 0:
+			self.DimmImage(self.Images[self.activeImageNo])
+		if self.activeImageMode == 1:
+			self.AnimateImage(self.Images[self.activeImageNo]);
 		
+	def AnimateImage(self, image):
+		if (super().updating_ended == True):
+			return
+
+		if (self._aniFrameNo >= len(image.Frames)):
+			self._aniFrameNo = 0
+			
+		self._dimmer = 1
+		self.showImage(image.Frames, self._aniFrameNo)
+		time.sleep(image.Delay)
+		
+		self._aniFrameNo = self._aniFrameNo+1
+		
+	def DimmImage(self, image):
 		if (super().updating_ended == True):
 			return
 		steps = 20
@@ -216,7 +242,8 @@ class RgbLeds(MultiProcessing):
 			self._pulse_phase = - self._pulse_phase
 
 		self._dimmer = 0.5 * self._pulse_step / steps 
-		self.showImage(self._hearthPic)
+		self.showImage(image.Frames)
+		
 		time.sleep(delay)
 
 	def Release(self):
@@ -232,7 +259,7 @@ class RgbLeds(MultiProcessing):
 if __name__ == "__main__":
 
 
-	leds = RgbLeds() 
+	leds = RgbLeds([my_path + '/../Gfx/Body/hearth2.gif', my_path + '/../../RoobertGifs/e8nZC.gif']) 
 
 	ended = False
 	

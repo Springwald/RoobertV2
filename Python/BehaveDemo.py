@@ -100,7 +100,8 @@ class BehaveDemo:
 		
 		while ended == False:
 			
-			self.Update()
+			self.UpdateFace()
+			self.FollowFace()
 			
 			events = pygame.event.get()
 			for event in events:
@@ -116,30 +117,43 @@ class BehaveDemo:
 					
 					if event.key == pygame.K_KP1:
 						self.FirstInfoAboutRoobert()
-
-					if event.key == pygame.K_TAB:
-						#start_new_thread(roobert.Greet,())
-						a=0
-
-	def Update(self):
-		self.UpdateFace()
-		self.FollowFace()
+						
+					if event.key == pygame.K_KP7:
+						self._hardwareDevices.BodyLeds.activeImageNo = 0
+						self._hardwareDevices.BodyLeds.activeImageMode = 0
+						
+					if event.key == pygame.K_KP8:
+						self._hardwareDevices.BodyLeds.activeImageNo = 1
+						self._hardwareDevices.BodyLeds.activeImageMode = 1
+						
+					if event.key == pygame.K_KP9:
+						self._hardwareDevices.BodyLeds.activeImageNo = 2
+						self._hardwareDevices.BodyLeds.activeImageMode = 1
+						
+					if event.key == pygame.K_KP4:
+						self._hardwareDevices.BodyLeds.activeImageNo = 3
+						self._hardwareDevices.BodyLeds.activeImageMode = 1
+						
+					if event.key == pygame.K_KP5:
+						self._hardwareDevices.BodyLeds.activeImageNo = 4
+						self._hardwareDevices.BodyLeds.activeImageMode = 1
+						
+					if event.key == pygame.K_KP6:
+						self._hardwareDevices.BodyLeds.activeImageNo = 5
+						self._hardwareDevices.BodyLeds.activeImageMode = 1
 
 	def UpdateFace(self):
 		if (self.showFace == True):
 			self._faceGfx.speaking = self._speechOutput.IsSpeaking();
 
-	def RandomHeadMovement(self):
-		if (self._neckLeftRight.targetReached==True):
-			movementArea = int(self._neckLeftRight.MaxSteps / 2)
-			self._neckLeftRight.targetPos =randrange(0,movementArea)
-		if (self._neckUpDown.targetReached==True):
-			movementArea = int(self._neckUpDown.MaxSteps / 2)
-			self._neckUpDown.targetPos =randrange(0, movementArea)
-			
 	def Greet(self):
 		
 		self._actionRunning = True
+		self.ResetNeck()
+		
+		# heart gif
+		self._hardwareDevices.BodyLeds.activeImageNo = 0
+		self._hardwareDevices.BodyLeds.activeImageMode = 0
 		
 		touchBody 		= [[1,212],[3,511],[5,138],[6,890],[7,702]]
 		holdInFront 	= [[1,186],[3,398],[5,260],[6,718],[7,603]]
@@ -175,10 +189,16 @@ class BehaveDemo:
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
 		while (self._hardwareDevices.arms.WaitTillTargetsReached()==False):
 			time.sleep(0.1)
+			
+	def ResetNeck(self):
+		self._hardwareDevices.neck.SetUpDown(0)
+		self._hardwareDevices.neck.SetLeftRight(0)
+		self._faceGfx.SetEyePos(0.5,0.5)
 
 	def FirstInfoAboutRoobert(self):
 		
 		self._actionRunning = True
+		self.ResetNeck()
 		
 		pointToSide			= [[1,207],[3,297],[5,533],[6,741],[7,797]]
 		pointToHead 		= [[1,204],[3,698],[5,395],[6,872],[7,781]]
@@ -188,6 +208,10 @@ class BehaveDemo:
 		
 		self.ResetArms()
 		
+		# heart gif
+		self._hardwareDevices.BodyLeds.activeImageNo = 0
+		self._hardwareDevices.BodyLeds.activeImageMode = 0
+		
 		self._hardwareDevices.arms.SetArm(gesture=pointToSide, left=False)
 		self._speechOutput.Speak("Ich kann ihnen gerne Details über mich erzählen.")
 		
@@ -195,6 +219,9 @@ class BehaveDemo:
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
 		self._speechOutput.Speak("Mein Gesicht ist ein Bildschirm und wird von einem Raspberry Pei gesteuert")
 		
+		# banana gif
+		self._hardwareDevices.BodyLeds.activeImageNo = 1
+		self._hardwareDevices.BodyLeds.activeImageMode = 1
 		self._hardwareDevices.arms.SetArm(gesture=pointToBodyDisplay, left=False);
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
 		self._speechOutput.Speak("In meinem Körper steckt eine weitere Anzeige mit 16 mal 16 Pixeln Auflösung")
@@ -206,11 +233,16 @@ class BehaveDemo:
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
 		
+		# heart gif
+		self._hardwareDevices.BodyLeds.activeImageNo = 0
+		self._hardwareDevices.BodyLeds.activeImageMode = 0
+		
 		self._actionRunning = False
 
 	def FollowFace(self):
 		
 		if (self._actionRunning == True):
+			self.ResetNeck()
 			return
 		
 		faceX = self._camera.posXFace
@@ -232,7 +264,6 @@ class BehaveDemo:
 				self._hardwareDevices.neck.SetLeftRight(self._hardwareDevices.neck.GetLeftRight() - int(diffX * 400))
 			if (math.fabs(diffY) > 0.1):
 				newY = self._hardwareDevices.neck.GetUpDown() - int(diffY * 300)
-				print (newY)
 				self._hardwareDevices.neck.SetUpDown(newY)
 				
 			self._faceGfx.SetEyePos(faceX,faceY)
@@ -241,6 +272,9 @@ class BehaveDemo:
 			if (timeSinceLastFace > 20):
 				# long time no face seen
 				self._faceGfx.SetEyePos(0.5,0.5)
+			if (timeSinceLastFace > 60):
+				# long time no face seen
+				self.ResetNeck()
 			
 	def __del__(self):
 		self.Release()

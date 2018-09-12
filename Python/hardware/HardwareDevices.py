@@ -85,6 +85,10 @@ class HardwareDevices():
 	@property
 	def neck(self):
 		return self._neck 
+	
+	@property
+	def BodyLeds(self):
+		return self._bodyLeds 
 
 	def __init__(self):
 		self._servos = LX16AServos();
@@ -95,7 +99,14 @@ class HardwareDevices():
 		self._neck.SetLeftRight(0)
 		self._neck.SetUpDown(0)
 		
-		self._bodyLeds = RgbLeds()
+		self._bodyLeds = RgbLeds([
+					my_path + '/../Gfx/Body/hearth2.gif', 
+					my_path + '/../../RoobertGifs/e8nZC.gif',
+					my_path + '/../../RoobertGifs/U9LwW86.gif',
+					my_path + '/../../RoobertGifs/Spin_Toad.gif',
+					my_path + '/../../RoobertGifs/haleye.gif',
+					my_path + '/../../RoobertGifs/Yoshi_render.gif'
+					])
 
 	def Release(self):
 		if (self._released == False):
