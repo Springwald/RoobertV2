@@ -71,7 +71,7 @@ class Arms():
 	#_rightCenteredValues	= [[1,370],[3,685],[5,510],[6,460],[7,495],[8,500]]
 
 	
-	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=560, rightHandOpen=540, rightHandClose=450):
+	def __init__(self, smartServoManager, leftHandOpen=480, leftHandClose=580, rightHandOpen=540, rightHandClose=430):
 		self._servoManager = smartServoManager
 		self._leftHandOpen = leftHandOpen
 		self._leftHandClose = leftHandClose
@@ -97,9 +97,8 @@ class Arms():
 		self._servoManager.AddMasterServo(servoId=8, centeredValue=500);
 		
 		# left arm
-		self._servoManager.AddMasterServo(servoId=11, centeredValue=565);
-		#self._servoManager.SetMaxStepsPerUpdate(servoId=11, 
-		self._servoManager.AddSlaveServo(servoId=12, masterServoId=11, reverseToMaster=-1, centeredValue=439);
+		self._servoManager.AddMasterServo(servoId=11, centeredValue=545);
+		self._servoManager.AddSlaveServo(servoId=12, masterServoId=11, reverseToMaster=-1, centeredValue=459);
 		self._servoManager.AddMasterServo(servoId=13, centeredValue=329);
 		self._servoManager.AddSlaveServo(servoId=14, masterServoId=13, reverseToMaster=-1, centeredValue=700);
 		self._servoManager.AddMasterServo(servoId=15, centeredValue=477);
@@ -155,14 +154,14 @@ class Arms():
 	def SetHand(self, opened, left):
 		if (left==True):
 			if (opened==True):
-				self._servoManager.MoveServo(12,self._leftHandOpen)
+				self._servoManager.MoveServo(18,self._leftHandOpen)
 			else:
-				self._servoManager.MoveServo(12,self._leftHandClose)
+				self._servoManager.MoveServo(18,self._leftHandClose)
 		else:
 			if (opened==True):
-				self._servoManager.MoveServo(6,self._rightHandOpen);
+				self._servoManager.MoveServo(8,self._rightHandOpen);
 			else:
-				self._servoManager.MoveServo(6,self._rightHandClose);
+				self._servoManager.MoveServo(8,self._rightHandClose);
 
 	def Release(self):
 		if (self._released == False):
@@ -193,8 +192,8 @@ if __name__ == "__main__":
 	tester = Arms(servoManager)
 	#tester.MirrorRightArmToLeft();
 	
-	tester.PrintRightArmValues()
-	#tester.PrintLeftArmValues();
+	#tester.PrintRightArmValues()
+	tester.PrintLeftArmValues();
 	
 	
 	servoManager.Start();

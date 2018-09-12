@@ -161,23 +161,36 @@ class BehaveDemo:
 		
 		self.ResetArms()
 
+		self._hardwareDevices.arms.SetHand(opened=False, left=True)
+		self._hardwareDevices.arms.SetHand(opened=False, left=False)
+
 		self._speechOutput.Speak("Guten Tag.", wait=True)
 			
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
 		self._hardwareDevices.arms.SetArm(gesture=touchBody, left=True);
 		self._speechOutput.Speak("Mein Name ist Robert", wait=False)
 		while (self._speechOutput.IsSpeaking()==True):
+			self.UpdateFace()
 			time.sleep(0.1)
 		
+		self._hardwareDevices.arms.SetHand(opened=False, left=True)
+		self._hardwareDevices.arms.SetHand(opened=False, left=False)
 		self._hardwareDevices.arms.SetArm(gesture=holdInFront, left=True);	
+		time.sleep(1)
 		self._speechOutput.Speak("Ich freue mich, Sie kennen zu lernen", wait=False)
 		time.sleep(1)
 		self._hardwareDevices.arms.SetArm(gesture=pointToUser, left=True);
 		self._hardwareDevices.arms.SetArm(gesture=pointToUser, left=False);
+		time.sleep(2)
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
+		self._hardwareDevices.arms.SetHand(opened=True, left=False)
 
 		while (self._speechOutput.IsSpeaking()==True):
+			self.UpdateFace()
 			time.sleep(0.1)
 			
 		while (self._hardwareDevices.arms.WaitTillTargetsReached()==False):
+			self.UpdateFace()
 			time.sleep(0.1)
 			
 		self.ResetArms()
@@ -203,10 +216,12 @@ class BehaveDemo:
 		pointToSide			= [[1,207],[3,297],[5,533],[6,741],[7,797]]
 		pointToHead 		= [[1,204],[3,698],[5,395],[6,872],[7,781]]
 		pointToBodyDisplay	= [[1,226],[3,374],[5,144],[6,842],[7,547]]
-		pointToOtherArm1 	= [[1,126],[3,525],[5,237],[6,804],[7,546]]
-		pointToOtherArm2 	= [[1,131],[3,481],[5,488],[6,896],[7,503]]
+		pointToOtherArm1 	= [[1,126],[3,525],[5,220],[6,804],[7,546]]
+		pointToOtherArm2 	= [[1,141],[3,481],[5,788],[6,910],[7,503]]
 		
 		self.ResetArms()
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
+		self._hardwareDevices.arms.SetHand(opened=True, left=False)
 		
 		# heart gif
 		self._hardwareDevices.BodyLeds.activeImageNo = 0
@@ -226,12 +241,22 @@ class BehaveDemo:
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
 		self._speechOutput.Speak("In meinem Körper steckt eine weitere Anzeige mit 16 mal 16 Pixeln Auflösung")
 		
+		self._hardwareDevices.arms.SetHand(opened=False, left=True)
+		self._hardwareDevices.arms.SetHand(opened=True, left=False)
 		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm1, left=False);
 		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm2, left=True);
 		self._speechOutput.Speak("Jeder meiner Arme wird von 8 Servo Motoren angetrieben.")
+	
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
+		self._hardwareDevices.arms.SetHand(opened=False, left=False)
+		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm2, left=False);
+		self._hardwareDevices.arms.SetArm(gesture=pointToOtherArm1, left=True);
+		self._speechOutput.Speak("Damit kann ich zahlreiche Gesten darstellen.")
 
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=True)
 		self._hardwareDevices.arms.SetArm(gesture=Arms._armHanging, left=False)
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
+		self._hardwareDevices.arms.SetHand(opened=True, left=False)
 		
 		# heart gif
 		self._hardwareDevices.BodyLeds.activeImageNo = 0
@@ -244,6 +269,9 @@ class BehaveDemo:
 		if (self._actionRunning == True):
 			self.ResetNeck()
 			return
+			
+		self._hardwareDevices.arms.SetHand(opened=True, left=True)
+		self._hardwareDevices.arms.SetHand(opened=True, left=False)
 		
 		faceX = self._camera.posXFace
 		faceY = self._camera.posYFace
