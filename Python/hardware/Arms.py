@@ -108,7 +108,7 @@ class Arms():
 
 	def PrintRightArmValues(self):
 		for id in range(1,8):
-			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
+			self._servoManager.SetIsReadOnly(servoId=id, isReadOnly=True);
 		self._servoManager.Start()
 		while(True):
 			self._servoManager.PrintReadOnlyServoValues()
@@ -116,24 +116,28 @@ class Arms():
 			
 	def PrintLeftArmValues(self):
 		for id in range(11,18):
-			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
+			self._servoManager.SetIsReadOnly(servoId=id, isReadOnly=True);
 		self._servoManager.Start()
 		while(True):
 			self._servoManager.PrintReadOnlyServoValues(onlyMasterServos=False)
 			time.sleep(0.1)
 			
-	def MirrorRightArmToLeft(self):
+
+	def MirrorRightArmToLeftStart(self):
 		for id in range(1,8):
-			self._servoManager.SetReadOnly(servoId=id, isReadOnly=True);
-		self._servoManager.Start()
-		while(True):
-			for id in [1,3,5,6,7,8]:
-				value = self._servoManager.ReadServo(id=id);
-				#print (str(id) + ":" +str(value))
-				value = -(value - self._servoManager.GetCenteredValue(id)) + self._servoManager.GetCenteredValue(id+10)
-				self._servoManager.MoveServo(id=id+10, pos=value);
-			time.sleep(0.01)
-			#clear()
+			self._servoManager.SetIsReadOnly(servoId=id, isReadOnly=True);
+		#self._servoManager.Start()
+
+	def MirrorRightArmToLeftUpdate(self):
+		for id in [1,3,5,6,7,8]:
+			value = self._servoManager.ReadServo(id);
+			#print (str(id) + ":" +str(value))
+			value = -(value - self._servoManager.GetCenteredValue(id)) + self._servoManager.GetCenteredValue(id+10)
+			self._servoManager.MoveServo(id+10, pos=value);
+
+	def MirrorRightArmToLeftEnd(self):
+		for id in range(1,8):
+			self._servoManager.SetIsReadOnly(servoId=id, isReadOnly=False);
 
 	def SetArm(self, gesture, left):
 		for p in range(0,len(gesture)):
@@ -143,10 +147,10 @@ class Arms():
 				id = id + 10;
 				value = -(value - self._servoManager.GetCenteredValue(id-10)) + self._servoManager.GetCenteredValue(id)
 				self._servoManager.MoveServo(id,value);
-				#print (id);
+				#print ("left:" + str(id));
 			else:
 				self._servoManager.MoveServo(id,value);
-				#print (id)
+				#print ("right:" + str(id))
 	def WaitTillTargetsReached(self):
 		while (self._servoManager.allTargetsReached == False):
 			time.sleep(0.1);

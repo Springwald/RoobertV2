@@ -112,33 +112,36 @@ class BehaveDemo:
 					if event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
 						ended = True 
 						
-					if event.key == pygame.K_KP0:
+					if event.key == pygame.K_KP0 or event.key == pygame.K_0:
 						self.Greet()
 					
-					if event.key == pygame.K_KP1:
+					if event.key == pygame.K_KP1 or event.key == pygame.K_1:
 						self.FirstInfoAboutRoobert()
 						
-					if event.key == pygame.K_KP7:
+					if event.key == pygame.K_KP3 or event.key == pygame.K_3:
+						self.MirrorRightArmToLeft()
+						
+					if event.key == pygame.K_KP7 or event.key == pygame.K_7:
 						self._hardwareDevices.BodyLeds.activeImageNo = 0
 						self._hardwareDevices.BodyLeds.activeImageMode = 0
 						
-					if event.key == pygame.K_KP8:
+					if event.key == pygame.K_KP8 or event.key == pygame.K_8:
 						self._hardwareDevices.BodyLeds.activeImageNo = 1
 						self._hardwareDevices.BodyLeds.activeImageMode = 1
 						
-					if event.key == pygame.K_KP9:
+					if event.key == pygame.K_KP9 or event.key == pygame.K_9:
 						self._hardwareDevices.BodyLeds.activeImageNo = 2
 						self._hardwareDevices.BodyLeds.activeImageMode = 1
 						
-					if event.key == pygame.K_KP4:
+					if event.key == pygame.K_KP4 or event.key == pygame.K_4:
 						self._hardwareDevices.BodyLeds.activeImageNo = 3
 						self._hardwareDevices.BodyLeds.activeImageMode = 1
 						
-					if event.key == pygame.K_KP5:
+					if event.key == pygame.K_KP5 or event.key == pygame.K_5:
 						self._hardwareDevices.BodyLeds.activeImageNo = 4
 						self._hardwareDevices.BodyLeds.activeImageMode = 1
 						
-					if event.key == pygame.K_KP6:
+					if event.key == pygame.K_KP6 or event.key == pygame.K_6:
 						self._hardwareDevices.BodyLeds.activeImageNo = 5
 						self._hardwareDevices.BodyLeds.activeImageMode = 1
 
@@ -261,6 +264,40 @@ class BehaveDemo:
 		# heart gif
 		self._hardwareDevices.BodyLeds.activeImageNo = 0
 		self._hardwareDevices.BodyLeds.activeImageMode = 0
+		
+		self._actionRunning = False
+		
+	def MirrorRightArmToLeft(self):
+		
+		self._actionRunning = True
+		self.ResetNeck()
+		self.ResetArms()
+		
+		self._speechOutput.Speak("Rechter Arm wird auf linken gespiegelt.")
+
+		self._hardwareDevices.arms.MirrorRightArmToLeftStart();
+		
+		ended = False
+		while ended == False:
+			
+			#pointToSide			= [[1,207],[3,297],[5,533],[6,741],[7,797]]
+			#self._hardwareDevices.arms.SetArm(gesture=pointToSide, left=True)
+			self._hardwareDevices.arms.MirrorRightArmToLeftUpdate();
+			time.sleep(0.01)
+						
+			events = pygame.event.get()
+			for event in events:
+				if event.type == pygame.MOUSEBUTTONUP:
+					ended = True 
+					
+				if event.type == pygame.KEYDOWN:
+					ended = True 
+		
+		self._hardwareDevices.arms.MirrorRightArmToLeftEnd();
+		
+		self._speechOutput.Speak("Spiegelung beendet.")
+		
+		self.ResetArms()
 		
 		self._actionRunning = False
 
